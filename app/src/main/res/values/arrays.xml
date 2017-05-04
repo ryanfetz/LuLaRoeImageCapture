@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="image_capture_types">
+        <item>@string/ict_Normal</item>
+        <item>@string/ict_Mashup</item>
+        <item>@string/ict_Outfit</item>
+    </string-array>
+
+
+    <string-array name="default_kid_sizes">
+        <item>@string/size_2</item>
+        <item>@string/size_4</item>
+        <item>@string/size_6</item>
+        <item>@string/size_8</item>
+        <item>@string/size_10</item>
+        <item>@string/size_12</item>
+        <item>@string/size_14</item>
+    </string-array>
+
+    <string-array name="no_14_sizes">
+        <item>@string/product_Adeline</item>
+        <item>@string/product_Mae</item>
+        <item>@string/product_Scarlett</item>
+        <item>@string/product_MNM_Adeline</item>
+        <item>@string/product_MNM_Scarlett</item>
+    </string-array>
+
+
+    <string-array name="kids_styles">
+        <item>@string/product_Adeline</item>
+        <item>@string/product_Gracie</item>
+        <item>@string/product_Kids_Azure</item>
+        <item>@string/product_Mae</item>
+        <item>@string/product_Scarlett</item>
+        <item>@string/product_Sloan</item>
+        <item>@string/product_MNM_Gracie</item>
+        <item>@string/product_MNM_Adeline</item>
+        <item>@string/product_MNM_Scarlett</item>
+    </string-array>
+
+    <string-array name="default_adult_sizes">
+        <item>@string/size_XXS</item>
+        <item>@string/size_XS</item>
+        <item>@string/size_S</item>
+        <item>@string/size_M</item>
+        <item>@string/size_L</item>
+        <item>@string/size_XL</item>
+        <item>@string/size_2XL</item>
+        <item>@string/size_3XL</item>
+    </string-array>
+
+    <string-array name="no_size">
+        <item>@string/product_Leggings_Tween</item>
+        <item>@string/product_Leggings_OS</item>
+        <item>@string/product_Leggings_TC</item>
+        <item>@string/product_Leggings_Kids_SM</item>
+        <item>@string/product_Leggings_Kids_LXL</item>
+        <item>@string/product_Mimi</item>
+        <item>@string/product_MNM_Leggings_Tween</item>
+        <item>@string/product_MNM_Leggings_OS</item>
+        <item>@string/product_MNM_Leggings_TC</item>
+        <item>@string/product_MNM_Leggings_Kids_SM</item>
+        <item>@string/product_MNM_Leggings_Kids_LXL</item>
+    </string-array>
+
+    <string-array name="no_xxs">
+        <item>@string/product_Ana</item>
+        <item>@string/product_Azure</item>
+        <item>@string/product_Cassie</item>
+        <item>@string/product_Jade</item>
+        <item>@string/product_Jordan</item>
+        <item>@string/product_Joy</item>
+        <item>@string/product_Lindsay</item>
+        <item>@string/product_Madison</item>
+        <item>@string/product_Mark</item>
+        <item>@string/product_Monroe</item>
+        <item>@string/product_Patrick</item>
+        <item>@string/product_Sarah</item>
+    </string-array>
+
+    <string-array name="no_xs">
+        <item>@string/product_Mark</item>
+        <item>@string/product_Monroe</item>
+        <item>@string/product_Patrick</item>
+    </string-array>
+
+    <string-array name="no_s">
+        <item>@string/product_Mark</item>
+        <item>@string/product_Patrick</item>
+    </string-array>
+
+    <string-array name="no_m">
+        <item>@string/product_Monroe</item>
+    </string-array>
+
+    <string-array name="no_xl">
+        <item>@string/product_Lindsay</item>
+        <item>@string/product_Monroe</item>
+    </string-array>
+
+    <string-array name="no_2xl">
+        <item>@string/product_Joy</item>
+        <item>@string/product_Lindsay</item>
+        <item>@string/product_Monroe</item>
+        <item>@string/product_Sarah</item>
+    </string-array>
+
+    <string-array name="no_3xl">
+        <item>@string/product_Jade</item>
+        <item>@string/product_Jill</item>
+        <item>@string/product_Jordan</item>
+        <item>@string/product_Joy</item>
+        <item>@string/product_Lindsay</item>
+        <item>@string/product_Lola</item>
+        <item>@string/product_Lucy</item>
+        <item>@string/product_Monroe</item>
+        <item>@string/product_Sarah</item>
+    </string-array>
+
+    <string-array name="bianka_sizes">
+        <item>@string/size_1C</item>
+        <item>@string/size_2C</item>
+        <item>@string/size_3C</item>
+    </string-array>
+
+    <string-array name="product_styles">
+        <item>@string/product_Adeline</item>
+        <item>@string/product_Amelia</item>
+        <item>@string/product_Ana</item>
+        <item>@string/product_Azure</item>
+        <item>@string/product_Bianka</item>
+        <item>@string/product_Carly</item>
+        <item>@string/product_Cassie</item>
+        <item>@string/product_Classic_T</item>
+        <item>@string/product_Gracie</item>
+        <item>@string/product_Irma</item>
+        <item>@string/product_Jade</item>
+        <item>@string/product_Jill</item>
+        <item>@string/product_Jordan</item>
+        <item>@string/product_Joy</item>
+        <item>@string/product_Julia</item>
+        <item>@string/product_Kids_Azure</item>
+        <item>@string/product_Leggings_Tween</item>
+        <item>@string/product_Leggings_OS</item>
+        <item>@string/product_Leggings_TC</item>
+        <item>@string/product_Leggings_Kids_SM</item>
+        <item>@string/product_Leggings_Kids_LXL</item>
+        <item>@string/product_Lindsay</item>
+        <item>@string/product_Lola</item>
+        <item>@string/product_Lucy</item>
+        <item>@string/product_Madison</item>
+        <item>@string/product_Mae</item>
+        <item>@string/product_Mark</item>
+        <item>@string/product_Maxi</item>
+        <item>@string/product_Mimi</item>
+        <item>@string/product_Monroe</item>
+        <item>@string/product_Nicole</item>
+        <item>@string/product_Patrick</item>
+        <item>@string/product_Perfect_T</item>
+        <item>@string/product_Randy</item>
+        <item>@string/product_Sarah</item>
+        <item>@string/product_Scarlett</item>
+        <item>@string/product_Sloan</item>
+        <item>@string/product_MNM_Gracie</item>
+        <item>@string/product_MNM_Irma</item>
+        <item>@string/product_MNM_Adeline</item>
+        <item>@string/product_MNM_Nicole</item>
+        <item>@string/product_MNM_Scarlett</item>
+        <item>@string/product_MNM_Carly</item>
+        <item>@string/product_MNM_Leggings_Tween</item>
+        <item>@string/product_MNM_Leggings_OS</item>
+        <item>@string/product_MNM_Leggings_TC</item>
+        <item>@string/product_MNM_Leggings_Kids_SM</item>
+        <item>@string/product_MNM_Leggings_Kids_LXL</item>
+    </string-array>
+</resources>

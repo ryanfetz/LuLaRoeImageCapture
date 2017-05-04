@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">LuLaRoe Image Maker</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
+
+    <string name="action_TakePicture">Take Picture</string>
+    <string name="action_TakeOutfitPicture">Outfit Picture</string>
+    <string name="action_TakeMashupPicture">Mashup Picture</string>
+
+    <string name="label_size">Size</string>
+    <string name="label_product">Product</string>
+    <string name="label_image_type">Image Type</string>
+
+    <string name="label_select_product">Select Product Style</string>
+    <string name="label_select_size">Select Size</string>
+
+    <string name="size_1C">1C</string>
+    <string name="size_2C">2C</string>
+    <string name="size_3C">3C</string>
+
+
+    <string name="ict_Normal">Normal</string>
+    <string name="ict_Mashup">Mashup</string>
+    <string name="ict_Outfit">Outfit</string>
+
+    <string name="size_NA">N/A</string>
+
+    <string name="size_XXS">XXS</string>
+    <string name="size_XS">XS</string>
+    <string name="size_S">S</string>
+    <string name="size_M">M</string>
+    <string name="size_L">L</string>
+    <string name="size_XL">XL</string>
+    <string name="size_2XL">2XL</string>
+    <string name="size_3XL">3XL</string>
+
+    <string name="size_2">2</string>
+    <string name="size_4">4</string>
+    <string name="size_6">6</string>
+    <string name="size_8">8</string>
+    <string name="size_10">10</string>
+    <string name="size_12">12</string>
+    <string name="size_14">14</string>
+
+    <string name="product_Adeline">Adeline</string>
+    <string name="product_Amelia">Amelia</string>
+    <string name="product_Ana">Ana</string>
+    <string name="product_Azure">Azure</string>
+    <string name="product_Bianka">Bianka</string>
+    <string name="product_Carly">Carly</string>
+    <string name="product_Cassie">Cassie</string>
+    <string name="product_Classic_T">Classic T</string>
+    <string name="product_Gracie">Gracie</string>
+    <string name="product_Irma">Irma</string>
+    <string name="product_Jade">Jade</string>
+    <string name="product_Jill">Jill</string>
+    <string name="product_Jordan">Jordan</string>
+    <string name="product_Joy">Joy</string>
+    <string name="product_Julia">Julia</string>
+    <string name="product_Kids_Azure">Kids Azure</string>
+    <string name="product_Leggings_Tween">Leggings - Tween</string>
+    <string name="product_Leggings_OS">Leggings - One Size</string>
+    <string name="product_Leggings_TC">Leggings - Tall &amp; Curvy</string>
+    <string name="product_Leggings_Kids_SM">Leggings - Kids S/M</string>
+    <string name="product_Leggings_Kids_LXL">Leggings - Kids L/XL</string>
+    <string name="product_Lindsay">Lindsay</string>
+    <string name="product_Lola">Lola</string>
+    <string name="product_Lucy">Lucy</string>
+    <string name="product_Madison">Madison</string>
+    <string name="product_Mae">Mae</string>
+    <string name="product_Mark">Mark</string>
+    <string name="product_Maxi">Maxi</string>
+    <string name="product_Mimi">Mimi</string>
+    <string name="product_Monroe">Monroe</string>
+    <string name="product_Nicole">Nicole</string>
+    <string name="product_Patrick">Patrick</string>
+    <string name="product_Perfect_T">Perfect T</string>
+    <string name="product_Randy">Randy</string>
+    <string name="product_Sarah">Sarah</string>
+    <string name="product_Scarlett">Scarlett</string>
+    <string name="product_Sloan">Sloan</string>
+
+    <string name="product_MNM_Gracie">Mommy &amp; Me - Gracie</string>
+    <string name="product_MNM_Irma">Mommy &amp; Me - Irma</string>
+    <string name="product_MNM_Adeline">Mommy &amp; Me - Adeline</string>
+    <string name="product_MNM_Nicole">Mommy &amp; Me - Nicole</string>
+    <string name="product_MNM_Scarlett">Mommy &amp; Me - Scarlett</string>
+    <string name="product_MNM_Carly">Mommy &amp; Me - Carly</string>
+    <string name="product_MNM_Leggings_Tween">Mommy &amp; Me - Tween</string>
+    <string name="product_MNM_Leggings_OS">Mommy &amp; Me - OS</string>
+    <string name="product_MNM_Leggings_TC">Mommy &amp; Me - TC</string>
+    <string name="product_MNM_Leggings_Kids_SM">Mommy &amp; Me - Kids S/M</string>
+    <string name="product_MNM_Leggings_Kids_LXL">Mommy &amp; Me - Kids L/XL</string>
+</resources>
