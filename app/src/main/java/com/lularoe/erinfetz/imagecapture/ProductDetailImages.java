@@ -4,10 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 public class ProductDetailImages{
     private static final String TAG = ProductDetailImages.class.getSimpleName();
     private static ProductDetailImages INSTANCE;
@@ -40,7 +36,7 @@ public class ProductDetailImages{
         }else if(productStyle.equals("Bianka")){
             return getImage(R.drawable.sizingchart_bianka_map);
         }else if(productStyle.equals("Carly")){
-            return getImage(R.drawable.sizingchart_Carly_map);
+            return getImage(R.drawable.sizingchart_carly_map);
         }else if(productStyle.equals("Cassie")){
             return getImage(R.drawable.sizingchart_cassie17);
         }else if(productStyle.equals("Classic T")){
@@ -80,7 +76,7 @@ public class ProductDetailImages{
         }else if(productStyle.equals("Madison")){
             return getImage(R.drawable.sizingchart_madison);
         }else if(productStyle.equals("Mae")){
-            return getImage(R.drawable.sizingchart_Mae_map);
+            return getImage(R.drawable.sizingchart_mae_map);
         }else if(productStyle.equals("Mark")){
             return getImage(R.drawable.sizingchart_mark_map);
         }else if(productStyle.equals("Maxi")){
@@ -92,13 +88,13 @@ public class ProductDetailImages{
         }else if(productStyle.equals("Nicole")){
             return getImage(R.drawable.sizingchart_nicole17);
         }else if(productStyle.equals("Patrick")){
-            return getImage(R.drawable.sizingchart_Patrick_map);
+            return getImage(R.drawable.sizingchart_patrick_map);
         }else if(productStyle.equals("Perfect T")){
             return getImage(R.drawable.sizingchart_perfectmap);
         }else if(productStyle.equals("Randy")){
-            return getImage(R.drawable.sizingchart_Randy17);
+            return getImage(R.drawable.sizingchart_randy17);
         }else if(productStyle.equals("Sarah")){
-            return getImage(R.drawable.sizingchart_Sarah_map);
+            return getImage(R.drawable.sizingchart_sarah_map);
         }else if(productStyle.equals("Scarlett")){
             return getImage(R.drawable.sizingchart_scarlett);
         }else if(productStyle.equals("Sloan")){
@@ -114,7 +110,7 @@ public class ProductDetailImages{
         }else if(productStyle.equals("Mommy &amp; Me - Scarlett")||productStyle.equals("Mommy & Me - Scarlett")){
             return getImage(R.drawable.sizingchart_scarlett);
         }else if(productStyle.equals("Mommy &amp; Me - Carly")||productStyle.equals("Mommy & Me - Carly")){
-            return getImage(R.drawable.mnm_sizingchart_Carly_map);
+            return getImage(R.drawable.mnm_sizingchart_carly_map);
         }else if(productStyle.equals("Mommy &amp; Me - Tween")||productStyle.equals("Mommy & Me - Tween")){
             return getImage(R.drawable.mnm_sizingchart_kidsleggings_map);
         }else if(productStyle.equals("Mommy &amp; Me - OS")||productStyle.equals("Mommy & Me - OS")){
