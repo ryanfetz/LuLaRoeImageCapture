@@ -25,6 +25,12 @@
 
     <string name="size_NA">N/A</string>
 
+    <string name="size_TC">TC</string>
+    <string name="size_TWN">TWN</string>
+    <string name="size_OS">OS</string>
+    <string name="size_S_M">S-M</string>
+    <string name="size_L_XL">L-XL</string>
+
     <string name="size_XXS">XXS</string>
     <string name="size_XS">XS</string>
     <string name="size_S">S</string>

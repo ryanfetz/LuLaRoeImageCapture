@@ -1,5 +1,6 @@
 package com.lularoe.erinfetz.imagecapture;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +38,8 @@ import com.google.common.base.Strings;
 
 public class MainActivity extends AppCompatActivity {
 
+    //TODO Handle Mashup Mode
+
     private Products products;
     private Spinner productStyleSpinner;
     private Spinner productSizeSpinner;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mImageView;
     private CheckBox mashupCheckBox;
     private ConstraintLayout imageLayout;
+    private InventoryImageMaker imageMaker;
 
     private static final String PRODUCT_STYLE_STORAGE_KEY = "productStyle";
     private static final String PRODUCT_SIZE_STORAGE_KEY = "productSize";
@@ -61,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        imageMaker = new InventoryImageMaker(this);
 
         FloatingActionButton deletePictureButton = (FloatingActionButton) findViewById(R.id.deletePicture);
         mImageView = (ImageView) findViewById(R.id.imageView1);
@@ -203,9 +209,44 @@ public class MainActivity extends AppCompatActivity {
 
     private void handlePhoto(Intent data) {
         if (mCurrentPhotoPath != null) {
+
+            createStandardImage();
             setPic();
-            //galleryAddPic();
+            galleryAddPic();
             //mCurrentPhotoPath = null;
+        }
+    }
+
+    private void createStandardImage(){
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inMutable=true;
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+        bitmap = imageMaker.standard(bitmap, currentProductStyle, currentProductSize);
+
+        File outFile = new File(mCurrentPhotoPath);
+
+        if(outFile.exists()){
+            outFile.delete();
+        }
+        FileOutputStream outStream=null;
+        try{
+            outStream = new FileOutputStream(outFile);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+
+        }catch(IOException e){
+            Log.e("LLRIC", e.getMessage(),e);
+        }finally{
+            try{
+                if(outStream!=null){
+                    outStream.flush();
+                    outStream.close();
+                }
+            }catch(IOException e1){
+
+                Log.e("LLRIC", e1.getMessage(),e1);
+            }
         }
     }
 

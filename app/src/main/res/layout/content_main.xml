@@ -157,7 +157,7 @@
         android:paddingRight="10dp"
         android:text="@string/action_TakePicture"
         android:textAlignment="center"
-        android:textColor="@color/colorLlrGrey"
+        android:textColor="@android:color/background_light"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
