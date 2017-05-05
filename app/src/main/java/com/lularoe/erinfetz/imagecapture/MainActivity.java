@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.Button;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.provider.MediaStore;
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String JPEG_FILE_SUFFIX = ".jpg";
 
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int WRITE_EXTERNAL_STORAGE_REQUEST = 5423;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         imageMaker = new InventoryImageMaker(this);
 
         FloatingActionButton deletePictureButton = (FloatingActionButton) findViewById(R.id.deletePicture);
+        FloatingActionButton acceptPictureButton = (FloatingActionButton) findViewById(R.id.acceptPicture);
         mImageView = (ImageView) findViewById(R.id.imageView1);
         productStyleSpinner = (Spinner) findViewById(R.id.spinner1);
         productSizeSpinner = (Spinner) findViewById(R.id.spinner2);
@@ -87,8 +94,9 @@ public class MainActivity extends AppCompatActivity {
         productStyleSpinner.setOnItemSelectedListener(mProductStyleListener);
         productSizeSpinner.setOnItemSelectedListener(mProductSizeListener);
         deletePictureButton.setOnClickListener(mDeleteClickListener);
+        acceptPictureButton.setOnClickListener(mAcceptClickListener);
         productSizeSpinner.setClickable(false);
-        takePictureButton.setClickable(false);
+        //takePictureButton.setClickable(false);
 
         imageLayout = (ConstraintLayout) findViewById(R.id.imageLayout);
         imageLayout.setVisibility(View.INVISIBLE);
@@ -97,8 +105,40 @@ public class MainActivity extends AppCompatActivity {
 //            setCurrentProductStyle(savedInstanceState.getString(PRODUCT_STYLE_STORAGE_KEY));
 //            setCurrentProductSize(savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY));
 //        }
-    }
 
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    WRITE_EXTERNAL_STORAGE_REQUEST);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case WRITE_EXTERNAL_STORAGE_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
     // Some lifecycle callbacks so that the image can survive orientation change
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -114,24 +154,46 @@ public class MainActivity extends AppCompatActivity {
         currentProductSize = savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY);
     }
 
+    private boolean directoryOk(File storageDir){
+        if(storageDir==null){
+            return false;
+        }
+
+        if (storageDir != null) {
+            if (! storageDir.mkdirs()) {
+                if (! storageDir.exists()){
+                    Log.e("LLRIC", "failed to create directory " + storageDir.getAbsolutePath());
+                    return false;
+                }
+            }
+        }
+
+        return storageDir.exists();
+    }
+
     private File getAlbumDirectory() {
         File storageDir = null;
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 
-            storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
-            if (storageDir != null) {
-                if (! storageDir.mkdirs()) {
-                    if (! storageDir.exists()){
-                        Log.d("LLRIC", "failed to create directory");
-                        return null;
-                    }
-                }
+            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getString(R.string.album_name));
+            if(directoryOk(storageDir)){
+                return storageDir;
             }
+
+            storageDir = getExternalFilesDir(getString(R.string.album_name));
+            if(directoryOk(storageDir)){
+                return storageDir;
+            }
+
 
         } else {
             Log.v("LLRIC", "External storage is not mounted READ/WRITE.");
+
+            storageDir = new File(getFilesDir(), getString(R.string.album_name));
+            if(directoryOk(storageDir)){
+                return storageDir;
+            }
         }
 
         return storageDir;
@@ -218,19 +280,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createStandardImage(){
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inMutable=true;
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 
-        bitmap = imageMaker.standard(bitmap, currentProductStyle, currentProductSize);
-
-        File outFile = new File(mCurrentPhotoPath);
-
-        if(outFile.exists()){
-            outFile.delete();
-        }
         FileOutputStream outStream=null;
         try{
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inMutable=true;
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+            bitmap = imageMaker.standard(mCurrentPhotoPath, bitmap, currentProductStyle, currentProductSize);
+
+            File outFile = new File(mCurrentPhotoPath);
+
+            if(outFile.exists()){
+                outFile.delete();
+            }
+
             outStream = new FileOutputStream(outFile);
 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
@@ -255,31 +319,41 @@ public class MainActivity extends AppCompatActivity {
 		/* There isn't enough memory to open up more than a couple camera photos */
 		/* So pre-scale the target bitmap into which the file is decoded */
 
+		try {
 		/* Get the size of the ImageView */
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
+            int targetW = mImageView.getWidth();
+            int targetH = mImageView.getHeight();
 
 		/* Get the size of the image */
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
 
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+            // Determine how much to scale down the image
+            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
 		/* Set bitmap options to scale the image decode target */
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
 
 		/* Decode the JPEG file into a Bitmap */
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 
 		/* Associate the Bitmap to the ImageView */
-        mImageView.setImageBitmap(bitmap);
-        mImageView.setVisibility(View.VISIBLE);
+            mImageView.setImageBitmap(bitmap);
+            imageLayout.setVisibility(View.VISIBLE);
+        }catch(Throwable e){
+            Log.e("LLRIC", e.getMessage(),e);
+        }
+    }
+
+    private void acceptCurrentPicture(){
+        mCurrentPhotoPath=null;
+        mImageView.setImageBitmap(null);
+        imageLayout.setVisibility(View.INVISIBLE);
     }
 
     private void deleteCurrentPicture(){
@@ -287,9 +361,9 @@ public class MainActivity extends AppCompatActivity {
             File f = new File(mCurrentPhotoPath);
             if(f.exists()){
                 if(f.delete()){
-                    Snackbar.make(findViewById(R.id.mainLayout1), "Previous file deleted.", Snackbar.LENGTH_SHORT);
+                    Snackbar.make(findViewById(R.id.mainLayout1), "Previous file deleted.", Snackbar.LENGTH_SHORT).show();
                 }else{
-                    Snackbar.make(findViewById(R.id.mainLayout1), "File unable to be deleted! " + mCurrentPhotoPath, Snackbar.LENGTH_SHORT);
+                    Snackbar.make(findViewById(R.id.mainLayout1), "File unable to be deleted! " + mCurrentPhotoPath, Snackbar.LENGTH_SHORT).show();
                 }
             }
 
@@ -342,8 +416,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
-            Snackbar.make(view, String.format("%s - %s", currentProductStyle, products.shortName(currentProductStyle)), Snackbar.LENGTH_SHORT);
             setCurrentProductStyle(parent.getItemAtPosition(pos).toString());
+            Snackbar.make(view, String.format("%s - %s", currentProductStyle, products.shortName(currentProductStyle)), Snackbar.LENGTH_SHORT).show();
         }
 
         @Override
@@ -356,8 +430,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 
-            Snackbar.make(view, currentProductSize, Snackbar.LENGTH_SHORT);
             setCurrentProductSize(parent.getItemAtPosition(pos).toString());
+            Snackbar.make(view, currentProductSize, Snackbar.LENGTH_SHORT).show();
         }
 
         @Override
@@ -380,6 +454,15 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     deleteCurrentPicture();
+                }
+            };
+
+
+    Button.OnClickListener mAcceptClickListener =
+            new Button.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    acceptCurrentPicture();
                 }
             };
 

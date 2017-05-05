@@ -21,7 +21,7 @@ public class Products {
 
     @NonNull
     private List<String> arrayResource(int id){
-        return Arrays.asList(resources.getStringArray(id));
+        return Lists.newArrayList(resources.getStringArray(id));
     }
     @NonNull
     private String stringResource(int id){
