@@ -7,10 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.widget.Button;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int STORAGE_PERM = 5423;
-    static final int CAMERA_PERM = 2354;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,24 +107,37 @@ public class MainActivity extends AppCompatActivity {
 //            setCurrentProductStyle(savedInstanceState.getString(PRODUCT_STYLE_STORAGE_KEY));
 //            setCurrentProductSize(savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY));
 //        }
-//
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission_group.STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission_group.STORAGE},
-//                    STORAGE_PERM);
-//        }
-//
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission_group.CAMERA)
-//                != PackageManager.PERMISSION_GRANTED) {
-//
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{ Manifest.permission_group.CAMERA},
-//                    CAMERA_PERM);
-//        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                showMessageOKCancel("You need to allow access to storage",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        STORAGE_PERM);
+                            }
+                        });
+                return;
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    STORAGE_PERM);
+            return;
+        }
+    }
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -132,17 +146,19 @@ public class MainActivity extends AppCompatActivity {
         if(tpp==STORAGE_PERM){
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show();
             }else{
                 Snackbar.make(findViewById(R.id.mainLayout1), "No Storage Permissions", Snackbar.LENGTH_SHORT).show();
             }
-        }else if(tpp==CAMERA_PERM){
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        }else{
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
 
-            }else{
-                Snackbar.make(findViewById(R.id.mainLayout1), "No Camera Permissions", Snackbar.LENGTH_SHORT).show();
-            }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            Toast.makeText(this, "Permission Granted Fo Real", Toast.LENGTH_LONG).show();
         }
     }
     // Some lifecycle callbacks so that the image can survive orientation change
@@ -182,10 +198,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 
-            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getString(R.string.album_name));
-            if(directoryOk(storageDir)){
-                return storageDir;
-            }
+            Log.v("LLRIC",String.format("%s", Environment.getExternalStorageDirectory()));
+            Log.v("LLRIC",String.format("%s", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)));
+
+//            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+//                      getString(R.string.album_name));
+//            if(directoryOk(storageDir)){
+//                return storageDir;
+//            }
 
             storageDir = getExternalFilesDir(getString(R.string.album_name));
             if(directoryOk(storageDir)){
@@ -256,15 +276,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (Throwable e) {
             Log.e("LLRIC", e.getMessage(), e);
             Snackbar.make(findViewById(R.id.mainLayout1), e.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
+
+            takePictureButton.setClickable(true);
         }
     }
 
     private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File photoFile = new File(mCurrentPhotoPath);
-        Uri contentUri = FileProvider.getUriForFile(this, "com.lularoe.erinfetz.imagecapture.fileprovider", photoFile);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File photoFile = new File(mCurrentPhotoPath);
+//        Uri contentUri = FileProvider.getUriForFile(this, "com.lularoe.erinfetz.imagecapture.fileprovider", photoFile);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
     }
 
     @Override
@@ -286,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
             setPic();
             galleryAddPic();
             //mCurrentPhotoPath = null;
+
+            takePictureButton.setClickable(true);
         }
     }
 
@@ -304,6 +328,8 @@ public class MainActivity extends AppCompatActivity {
             if(outFile.exists()){
                 outFile.delete();
             }
+
+            //outFile = new File(outFile.getParent(), "1_"+outFile.getName());
 
             outStream = new FileOutputStream(outFile);
 
@@ -455,6 +481,7 @@ public class MainActivity extends AppCompatActivity {
             new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    takePictureButton.setClickable(false);
                     dispatchTakePictureIntent();
                 }
             };
