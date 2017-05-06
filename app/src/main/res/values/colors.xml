@@ -13,4 +13,7 @@
     <color name="colorLlrBrightBlue">#64CCC9</color>
     <color name="colorLlrGrey">#888b8d</color>
 
+    <color name="black_overlay">#66000000</color>
+
+    <color name="control_background">#cc4285f4</color>
 </resources>

@@ -100,4 +100,10 @@
     <string name="product_MNM_Leggings_TC">Mommy &amp; Me - TC</string>
     <string name="product_MNM_Leggings_Kids_SM">Mommy &amp; Me - Kids S/M</string>
     <string name="product_MNM_Leggings_Kids_LXL">Mommy &amp; Me - Kids L/XL</string>
+
+    <string name="title_activity_camera">Camera</string>
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
 </resources>

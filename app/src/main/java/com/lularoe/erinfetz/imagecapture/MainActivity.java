@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private Button takePictureButton;
     private String currentProductStyle=null;
     private String currentProductSize=null;
-    private String mCurrentPhotoPath;
+    private ImageFileInfo mCurrentFile;
     private ImageView mImageView;
     private CheckBox mashupCheckBox;
     private ConstraintLayout imageLayout;
@@ -62,10 +62,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String PRODUCT_STYLE_STORAGE_KEY = "productStyle";
     private static final String PRODUCT_SIZE_STORAGE_KEY = "productSize";
 
-    private static final String JPEG_FILE_SUFFIX = ".jpg";
-
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int STORAGE_PERM = 5423;
+    static final int CAMERA_PERM = 2354;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,26 +107,31 @@ public class MainActivity extends AppCompatActivity {
 //            setCurrentProductSize(savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY));
 //        }
 
+        checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERM);
+        checkPermissions(Manifest.permission.CAMERA, CAMERA_PERM);
+    }
+
+    private void checkPermissions(final String perm, final int code){
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                perm)
                 != PackageManager.PERMISSION_GRANTED) {
 
             if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    perm)) {
                 showMessageOKCancel("You need to allow access to storage",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        STORAGE_PERM);
+                                        new String[] {perm},
+                                        code);
                             }
                         });
                 return;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    STORAGE_PERM);
+                    new String[] {perm},
+                    code);
             return;
         }
     }
@@ -143,23 +147,39 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
        int tpp = requestCode;
-        if(tpp==STORAGE_PERM){
+        if(tpp==STORAGE_PERM) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show();
+
+//                if (ContextCompat.checkSelfPermission(this,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        == PackageManager.PERMISSION_GRANTED) {
+//
+//                    Toast.makeText(this, "Permission Granted For Real", Toast.LENGTH_LONG).show();
+//                }
+            } else {
+                Snackbar.make(findViewById(R.id.mainLayout1), "No Permissions", Snackbar.LENGTH_SHORT).show();
+            }
+        }else if (tpp == CAMERA_PERM){
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show();
+
+//                if (ContextCompat.checkSelfPermission(this,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        == PackageManager.PERMISSION_GRANTED) {
+//
+//                    Toast.makeText(this, "Permission Granted For Real", Toast.LENGTH_LONG).show();
+//                }
             }else{
-                Snackbar.make(findViewById(R.id.mainLayout1), "No Storage Permissions", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.mainLayout1), "No Permissions", Snackbar.LENGTH_SHORT).show();
             }
         }else{
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
 
-            Toast.makeText(this, "Permission Granted Fo Real", Toast.LENGTH_LONG).show();
-        }
     }
     // Some lifecycle callbacks so that the image can survive orientation change
     @Override
@@ -176,81 +196,18 @@ public class MainActivity extends AppCompatActivity {
         currentProductSize = savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY);
     }
 
-    private boolean directoryOk(File storageDir){
-        if(storageDir==null){
-            return false;
-        }
+    private ImageFileInfo setUpPhotoFile() throws IOException {
 
-        if (storageDir != null) {
-            if (! storageDir.mkdirs()) {
-                if (! storageDir.exists()){
-                    Log.e("LLRIC", "failed to create directory " + storageDir.getAbsolutePath());
-                    return false;
-                }
-            }
-        }
-
-        return storageDir.exists();
-    }
-
-    private File getAlbumDirectory() {
-        File storageDir = null;
-
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-
-            Log.v("LLRIC",String.format("%s", Environment.getExternalStorageDirectory()));
-            Log.v("LLRIC",String.format("%s", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)));
-
-//            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-//                      getString(R.string.album_name));
-//            if(directoryOk(storageDir)){
-//                return storageDir;
-//            }
-
-            storageDir = getExternalFilesDir(getString(R.string.album_name));
-            if(directoryOk(storageDir)){
-                return storageDir;
-            }
-
-
-        } else {
-            Log.v("LLRIC", "External storage is not mounted READ/WRITE.");
-
-            storageDir = new File(getFilesDir(), getString(R.string.album_name));
-            if(directoryOk(storageDir)){
-                return storageDir;
-            }
-        }
-
-        return storageDir;
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String product = products.shortName(currentProductStyle);
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        String imageFileName = currentProductSize==null?
-                String.format("%s_%s", product, timeStamp) :
-                String.format("%s_%s_%s", product, currentProductSize, timeStamp);
-
-        File albumF = getAlbumDirectory();
-        File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumF);
-        return imageF;
-    }
-
-    private File setUpPhotoFile() throws IOException {
-
-        File f = createImageFile();
-        mCurrentPhotoPath = f.getAbsolutePath();
-
-        return f;
+        return StorageUtils.createImageFile(this,
+                Environment.DIRECTORY_PICTURES,
+                getString(R.string.album_name),
+                products.shortName(currentProductStyle),
+                currentProductSize);
     }
 
     private void dispatchTakePictureIntent() {
         try {
-            mCurrentPhotoPath = null;
+            mCurrentFile = null;
             mImageView.setImageBitmap(null);
             imageLayout.setVisibility(View.INVISIBLE);
 
@@ -258,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
             // Ensure that there's a camera activity to handle the intent
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 // Create the File where the photo should go
-                File photoFile = null;
+                ImageFileInfo photoFile = null;
                 try {
                     photoFile = setUpPhotoFile();
                 } catch (IOException ex) {
@@ -267,9 +224,10 @@ public class MainActivity extends AppCompatActivity {
 
                 // Continue only if the File was successfully created
                 if (photoFile != null) {
-                    mCurrentPhotoPath = photoFile.getAbsolutePath();
-                    Uri photoURI = FileProvider.getUriForFile(this, "com.lularoe.erinfetz.imagecapture.fileprovider", photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    mCurrentFile = photoFile;
+                    Uri puri = mCurrentFile.getUri(this);
+                    Log.v("LLRIC", puri.toString());
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, puri);
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
@@ -282,11 +240,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void galleryAddPic() {
-//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//        File photoFile = new File(mCurrentPhotoPath);
-//        Uri contentUri = FileProvider.getUriForFile(this, "com.lularoe.erinfetz.imagecapture.fileprovider", photoFile);
-//        mediaScanIntent.setData(contentUri);
-//        this.sendBroadcast(mediaScanIntent);
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File photoFile = mCurrentFile.getFile();
+        Uri contentUri = StorageUtils.getFileURI(this, photoFile);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     @Override
@@ -302,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handlePhoto(Intent data) {
-        if (mCurrentPhotoPath != null) {
+        if (mCurrentFile != null) {
 
             createStandardImage();
             setPic();
@@ -319,17 +277,15 @@ public class MainActivity extends AppCompatActivity {
         try{
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
             bmOptions.inMutable=true;
-            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentFile.getFile().getAbsolutePath(), bmOptions);
 
-            bitmap = imageMaker.standard(mCurrentPhotoPath, bitmap, currentProductStyle, currentProductSize);
+            bitmap = imageMaker.standard(mCurrentFile.getFile().getAbsolutePath(), bitmap, currentProductStyle, currentProductSize);
 
-            File outFile = new File(mCurrentPhotoPath);
+            File outFile = mCurrentFile.getFile();
 
             if(outFile.exists()){
                 outFile.delete();
             }
-
-            //outFile = new File(outFile.getParent(), "1_"+outFile.getName());
 
             outStream = new FileOutputStream(outFile);
 
@@ -363,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
 		/* Get the size of the image */
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
             bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            BitmapFactory.decodeFile(mCurrentFile.getFile().getAbsolutePath(), bmOptions);
             int photoW = bmOptions.outWidth;
             int photoH = bmOptions.outHeight;
 
@@ -376,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
             bmOptions.inPurgeable = true;
 
 		/* Decode the JPEG file into a Bitmap */
-            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentFile.getFile().getAbsolutePath(), bmOptions);
 
 		/* Associate the Bitmap to the ImageView */
             mImageView.setImageBitmap(bitmap);
@@ -387,23 +343,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void acceptCurrentPicture(){
-        mCurrentPhotoPath=null;
+        mCurrentFile=null;
         mImageView.setImageBitmap(null);
         imageLayout.setVisibility(View.INVISIBLE);
     }
 
     private void deleteCurrentPicture(){
-        if (mCurrentPhotoPath != null) {
-            File f = new File(mCurrentPhotoPath);
+        if (mCurrentFile != null) {
+            File f = mCurrentFile.getFile();
             if(f.exists()){
                 if(f.delete()){
                     Snackbar.make(findViewById(R.id.mainLayout1), "Previous file deleted.", Snackbar.LENGTH_SHORT).show();
                 }else{
-                    Snackbar.make(findViewById(R.id.mainLayout1), "File unable to be deleted! " + mCurrentPhotoPath, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(R.id.mainLayout1), "File unable to be deleted! " +
+                            mCurrentFile.getFile().getAbsolutePath(), Snackbar.LENGTH_SHORT).show();
                 }
             }
 
-            mCurrentPhotoPath=null;
+            mCurrentFile=null;
             mImageView.setImageBitmap(null);
             imageLayout.setVisibility(View.INVISIBLE);
         }

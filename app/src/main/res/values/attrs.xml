@@ -2,13 +2,22 @@
 <resources>
 
     <declare-styleable name="Fonts">
-        <attr name="typeface" format="string|reference"/>
+        <attr name="typeface" format="string|reference" />
         <attr name="android:textStyle" />
         <attr name="_BorderColor" format="color|reference" />
         <attr name="_BorderWidth" format="dimension|reference" />
     </declare-styleable>
 
-    <item type="id" name="_FontsExtraData" />
+    <item name="_FontsExtraData" type="id" />
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
 
 
 </resources>
