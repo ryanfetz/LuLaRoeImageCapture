@@ -1,16 +1,45 @@
 package com.lularoe.erinfetz.imagecapture;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
+import android.widget.ImageView;
+
+import com.lularoe.erinfetz.imagecapture.storage.StoredImageFile;
 
 import java.io.IOException;
 
 public class BitmapUtils {
     private BitmapUtils(){
 
+    }
+
+    public static Bitmap loadForView(ImageView imageView, StoredImageFile file){
+        /* Get the size of the ImageView */
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        /* Get the size of the image */
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getFile().getAbsolutePath(), bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+
+        /* Set bitmap options to scale the image decode target */
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        /* Decode the JPEG file into a Bitmap */
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getFile().getAbsolutePath(), bmOptions);
+        return bitmap;
     }
 
     public static Bitmap resizeWidth(Bitmap image, int maxWidth){

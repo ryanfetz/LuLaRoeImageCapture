@@ -5,6 +5,8 @@
 
 
     <string name="album_name">LuLaRoeProductImages</string>
+    <string name="message_perm_storage">You need to allow access to storage.</string>
+    <string name="message_perm_camera">You need to allow access to camera.</string>
 
     <string name="action_TakePicture">Take Picture</string>
     <string name="action_TakeOutfitPicture">Outfit Picture</string>

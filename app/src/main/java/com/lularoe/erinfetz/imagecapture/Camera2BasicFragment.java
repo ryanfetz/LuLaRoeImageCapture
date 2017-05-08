@@ -60,6 +60,13 @@ import java.util.concurrent.TimeUnit;
 public class Camera2BasicFragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
+    public static Camera2BasicFragment newInstance(String outputFile) {
+        Camera2BasicFragment f = new Camera2BasicFragment();
+        f.mFile=new File(outputFile);
+        return f;
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,7 +76,7 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
+        //view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
     }
 
@@ -217,6 +224,11 @@ public class Camera2BasicFragment extends Fragment
             mCameraDevice = null;
             Activity activity = getActivity();
             if (null != activity) {
+                Intent intent=new Intent();
+                intent.putExtra("error", true);
+                intent.putExtra("errorMessage", "Error: "+error);
+                activity.setResult(500, intent);
+
                 activity.finish();
             }
         }
@@ -252,7 +264,7 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new ImageSaver(getActivity(),reader.acquireNextImage(), mFile));
         }
 
     };
@@ -422,13 +434,6 @@ public class Camera2BasicFragment extends Fragment
             return choices[0];
         }
     }
-
-    public static Camera2BasicFragment newInstance(String outputFile) {
-        Camera2BasicFragment f = new Camera2BasicFragment();
-        f.mFile=new File(outputFile);
-        return f;
-    }
-
 
     @Override
     public void onResume() {
@@ -902,12 +907,15 @@ public class Camera2BasicFragment extends Fragment
          * The JPEG image
          */
         private final Image mImage;
+
+        private final Activity activity;
         /**
          * The file we save the image into.
          */
         private final File mFile;
 
-        public ImageSaver(Image image, File file) {
+        public ImageSaver(Activity activity, Image image, File file) {
+            this.activity= activity;
             mImage = image;
             mFile = file;
         }
@@ -918,11 +926,15 @@ public class Camera2BasicFragment extends Fragment
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
             FileOutputStream output = null;
+            boolean error = false;
+            String errorMessage = "";
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(),e);
+                error = true;
+                errorMessage = e.getMessage();
             } finally {
                 mImage.close();
                 if (null != output) {
@@ -932,6 +944,13 @@ public class Camera2BasicFragment extends Fragment
                         e.printStackTrace();
                     }
                 }
+
+                Intent intent=new Intent();
+                intent.putExtra("data",mFile.getAbsolutePath());
+                intent.putExtra("error", error);
+                intent.putExtra("errorMessage", errorMessage);
+                activity.setResult(error?500:200, intent);
+                activity.finish();
             }
         }
 
@@ -969,11 +988,17 @@ public class Camera2BasicFragment extends Fragment
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
+            final String msg =getArguments().getString(ARG_MESSAGE);
             return new AlertDialog.Builder(activity)
-                    .setMessage(getArguments().getString(ARG_MESSAGE))
+                    .setMessage(msg)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent=new Intent();
+                            intent.putExtra("error", true);
+                            intent.putExtra("errorMessage", msg);
+                            activity.setResult(500, intent);
+
                             activity.finish();
                         }
                     })
@@ -1006,6 +1031,10 @@ public class Camera2BasicFragment extends Fragment
                                 public void onClick(DialogInterface dialog, int which) {
                                     Activity activity = parent.getActivity();
                                     if (activity != null) {
+                                        Intent intent=new Intent();
+                                        intent.putExtra("error", true);
+                                        intent.putExtra("errorMessage", "No Permissions");
+                                        activity.setResult(00, intent);
                                         activity.finish();
                                     }
                                 }

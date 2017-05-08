@@ -7,9 +7,13 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
+import android.util.Log;
 
 import com.google.common.base.Strings;
+import com.lularoe.erinfetz.imagecapture.storage.StoredImageFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class InventoryImageMaker {
@@ -38,6 +42,40 @@ public class InventoryImageMaker {
         return BitmapFactory.decodeResource(context.getResources(),id);
     }
 
+    public void createStandardImage(StoredImageFile input, String currentProductStyle, String currentProductSize){
+
+        FileOutputStream outStream=null;
+        try{
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inMutable=true;
+            Bitmap bitmap = BitmapFactory.decodeFile(input.getFile().getAbsolutePath(), bmOptions);
+
+            bitmap = this.standard(input.getFile().getAbsolutePath(), bitmap, currentProductStyle, currentProductSize);
+
+            File outFile = input.getFile();
+
+            if(outFile.exists()){
+                outFile.delete();
+            }
+
+            outStream = new FileOutputStream(outFile);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+
+        }catch(IOException e){
+            Log.e(TAG, e.getMessage(),e);
+        }finally{
+            try{
+                if(outStream!=null){
+                    outStream.flush();
+                    outStream.close();
+                }
+            }catch(IOException e1){
+
+                Log.e(TAG, e1.getMessage(),e1);
+            }
+        }
+    }
 
     public Bitmap standard(String photoPath, Bitmap bitmap, String style, String size)throws IOException {
 

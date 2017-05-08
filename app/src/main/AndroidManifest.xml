@@ -6,7 +6,7 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera2.full" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -41,12 +41,16 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+
         <activity
             android:name=".CameraActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_camera"
             android:theme="@style/MaterialTheme">
-
+            <intent-filter>
+                <action android:name="com.lularoe.erinfetz.imagecapture.IMAGE_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 
