@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -101,18 +102,11 @@ public class MainActivity extends AppCompatActivity {
         productSizeSpinner.setOnItemSelectedListener(mProductSizeListener);
         deletePictureButton.setOnClickListener(mDeleteClickListener);
         acceptPictureButton.setOnClickListener(mAcceptClickListener);
-        productSizeSpinner.setClickable(false);
-        //takePictureButton.setClickable(false);
 
         imageLayout = (ConstraintLayout) findViewById(R.id.imageLayout);
         imageLayout.setVisibility(View.INVISIBLE);
 
         mainLayout= (ConstraintLayout) findViewById(R.id.mainLayout1);
-
-//        if(savedInstanceState!=null) {
-//            setCurrentProductStyle(savedInstanceState.getString(PRODUCT_STYLE_STORAGE_KEY));
-//            setCurrentProductSize(savedInstanceState.getString(PRODUCT_SIZE_STORAGE_KEY));
-//        }
 
         checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERM, getString(R.string.message_perm_storage));
         checkPermissions(Manifest.permission.CAMERA, CAMERA_PERM, getString(R.string.message_perm_camera));
@@ -196,44 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    private void dispatchTakePictureIntent2() {
-        try {
-            mCurrentFile = null;
-            mImageView.setImageBitmap(null);
-            imageLayout.setVisibility(View.INVISIBLE);
-
-            Intent takePictureIntent = new Intent(CameraActivity.ACTION_IMAGE_CAPTURE);
-            // Ensure that there's a camera activity to handle the intent
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                // Create the File where the photo should go
-                StoredImageFile photoFile = null;
-                try {
-                    photoFile = storage.createImageFile(Environment.DIRECTORY_PICTURES,
-                            getString(R.string.album_name),
-                            products.shortName(currentProductStyle),
-                            currentProductSize);
-                } catch (IOException ex) {
-                    Log.e(TAG, ex.getMessage(), ex);
-                }
-
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    mCurrentFile = photoFile;
-                    Log.v(TAG, mCurrentFile.getUri().toString());
-                    takePictureIntent.putExtra(CameraActivity.INTENT_DATA_FILE, mCurrentFile.getFile().getAbsolutePath());
-                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                }
-            }else{
-                Log.e(TAG, "No Activity Found");
-            }
-        } catch (Throwable e) {
-            Log.e(TAG, e.getMessage(), e);
-            Snackbar.make(mainLayout, e.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
-
-            takePictureButton.setClickable(true);
-        }
-    }
     private void dispatchTakePictureIntent() {
         try {
             mCurrentFile = null;
