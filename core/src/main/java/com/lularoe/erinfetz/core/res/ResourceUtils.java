@@ -1,12 +1,14 @@
-package com.lularoe.erinfetz.imagecapture;
-
-import java.util.*;
+package com.lularoe.erinfetz.core.res;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ResourceUtils {
     private static final String TAG = ResourceUtils.class.getSimpleName();

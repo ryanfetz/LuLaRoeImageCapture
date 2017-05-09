@@ -1,5 +1,6 @@
 package com.lularoe.erinfetz.core.storage;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -7,7 +8,9 @@ import android.util.Log;
 
 import com.lularoe.erinfetz.core.storage.dir.DirectoryProvider;
 import com.lularoe.erinfetz.core.storage.dir.StorageDirectory;
+import com.lularoe.erinfetz.core.storage.files.FileExtensions;
 import com.lularoe.erinfetz.core.storage.files.FileNameProvider;
+import com.lularoe.erinfetz.core.storage.files.MediaType;
 import com.lularoe.erinfetz.core.storage.files.StoredFile;
 
 import java.io.File;
@@ -17,10 +20,12 @@ public class StorageService {
     private static final String TAG = StorageService.class.getSimpleName();
     private final StorageUriProvider uriProvider;
     private final DirectoryProvider directoryProvider;
+    private final FileExtensions fe;
 
-    public StorageService(DirectoryProvider directoryProvider, StorageUriProvider uriProvider){
+    public StorageService(Context context, DirectoryProvider directoryProvider, StorageUriProvider uriProvider){
         this.uriProvider=uriProvider;
         this.directoryProvider = directoryProvider;
+        this.fe = new FileExtensions(context);
     }
 
     public StorageUriProvider getUriProvider() {
@@ -34,25 +39,25 @@ public class StorageService {
         return false;
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull String fileType, StorageDirectory dir) throws IllegalAccessException, IOException {
+    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, StorageDirectory dir) throws IllegalAccessException, IOException {
         String fileName = fnProvider.provide();
 
-        File file = File.createTempFile(fileName, fileType, dir.getDirectory());
+        File file = File.createTempFile(fileName, "."+fe.toFileExtension(fileType), dir.getDirectory());
         Log.v(TAG, file.getAbsolutePath());
 
         Uri uri = getUri(file);
         Log.v(TAG, uri.toString());
 
-        return new StoredFile(dir, file, uri);
+        return new StoredFile(dir, file, fileType, uri);
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull String fileType, @NonNull String directoryType) throws IllegalAccessException, IOException {
+    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType) throws IllegalAccessException, IOException {
         StorageDirectory dir = getDirectory(directoryType);
 
         return createFile(fnProvider, fileType, dir);
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull String fileType, @NonNull String directoryType, @NonNull String subDirectory) throws IllegalAccessException, IOException {
+    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType, @NonNull String subDirectory) throws IllegalAccessException, IOException {
         StorageDirectory dir = getDirectory(directoryType, subDirectory);
 
         return createFile(fnProvider, fileType, dir);
