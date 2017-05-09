@@ -62,10 +62,12 @@ public class FontManager {
             if (!mCache.containsKey(name)) {
                 Typeface t = Typeface.createFromAsset(mContext.getAssets(),
                         String.format("fonts/%s", name));
+
                 mCache.put(name, t);
-                return t;
+                return Typeface.create(t, style);
             } else {
-                return mCache.get(name);
+                Typeface t = mCache.get(name);
+                return Typeface.create(t, style);
             }
         }
     }
