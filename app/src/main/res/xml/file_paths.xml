@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-path name="external_images" path="Android/data/com.lularoe.erinfetz.imagecapture/files/Pictures/" />
-    <external-path name="external_pictures" path="Pictures/LuLaRoeProductImages" />
+    <external-path name="external_pictures" path="Pictures/" />
     <files-path name="internal_images" path="images/" />
 </paths>

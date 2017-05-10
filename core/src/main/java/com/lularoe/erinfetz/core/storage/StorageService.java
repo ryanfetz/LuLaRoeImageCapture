@@ -9,7 +9,7 @@ import android.util.Log;
 import com.lularoe.erinfetz.core.storage.dir.DirectoryProvider;
 import com.lularoe.erinfetz.core.storage.dir.StorageDirectory;
 import com.lularoe.erinfetz.core.storage.files.FileExtensions;
-import com.lularoe.erinfetz.core.storage.files.FileNameProvider;
+import com.lularoe.erinfetz.core.storage.files.FileInfoProvider;
 import com.lularoe.erinfetz.core.storage.files.MediaType;
 import com.lularoe.erinfetz.core.storage.files.StoredFile;
 
@@ -39,25 +39,25 @@ public class StorageService {
         return false;
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, StorageDirectory dir) throws IllegalAccessException, IOException {
-        String fileName = fnProvider.provide();
+    public StoredFile createFile(@NonNull FileInfoProvider fnProvider, @NonNull MediaType fileType, StorageDirectory dir) throws IllegalAccessException, IOException {
+        FileInfoProvider.FileInfo fileInfo = fnProvider.provide();
 
-        File file = File.createTempFile(fileName, "."+fe.toFileExtension(fileType), dir.getDirectory());
+        File file = File.createTempFile(fileInfo.name(), fe.toFileExtension(fileType,true), dir.getDirectory());
         Log.v(TAG, file.getAbsolutePath());
 
         Uri uri = getUri(file);
         Log.v(TAG, uri.toString());
 
-        return new StoredFile(dir, file, fileType, uri);
+        return new StoredFile(dir, file, fileType, uri, fileInfo.contentValues());
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType) throws IllegalAccessException, IOException {
+    public StoredFile createFile(@NonNull FileInfoProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType) throws IllegalAccessException, IOException {
         StorageDirectory dir = getDirectory(directoryType);
 
         return createFile(fnProvider, fileType, dir);
     }
 
-    public StoredFile createFile(@NonNull FileNameProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType, @NonNull String subDirectory) throws IllegalAccessException, IOException {
+    public StoredFile createFile(@NonNull FileInfoProvider fnProvider, @NonNull MediaType fileType, @NonNull String directoryType, @NonNull String subDirectory) throws IllegalAccessException, IOException {
         StorageDirectory dir = getDirectory(directoryType, subDirectory);
 
         return createFile(fnProvider, fileType, dir);

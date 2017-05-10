@@ -4,13 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.media.ExifInterface;
 import android.util.Log;
 
 import com.google.common.base.Strings;
-import com.lularoe.erinfetz.imagecapture.storage.StoredImageFile;
+import com.lularoe.erinfetz.core.storage.files.StoredFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +40,7 @@ public class InventoryImageMaker {
         return BitmapFactory.decodeResource(context.getResources(),id);
     }
 
-    public void createStandardImage(StoredImageFile input, String currentProductStyle, String currentProductSize){
+    public void createStandardImage(StoredFile input, String currentProductStyle, String currentProductSize){
 
         FileOutputStream outStream=null;
         try{
@@ -60,7 +58,7 @@ public class InventoryImageMaker {
 
             outStream = new FileOutputStream(outFile);
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
 
         }catch(IOException e){
             Log.e(TAG, e.getMessage(),e);

@@ -1,19 +1,16 @@
 package com.lularoe.erinfetz.imagecapture;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.Date;
 
 import android.Manifest;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.widget.Button;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -25,21 +22,33 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Environment;
-import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
-import android.widget.Toast;
-import android.graphics.BitmapFactory;
 
 import com.google.common.base.Strings;
-import com.lularoe.erinfetz.imagecapture.storage.StorageService;
-import com.lularoe.erinfetz.imagecapture.storage.StoredImageFile;
+import com.lularoe.erinfetz.core.intents.IntentManager;
+import com.lularoe.erinfetz.core.ContentValuesBuilder;
+import com.lularoe.erinfetz.core.media.MediaStoreManager;
+import com.lularoe.erinfetz.core.storage.DefaultStorageUriProvider;
+import com.lularoe.erinfetz.core.storage.StorageService;
+import com.lularoe.erinfetz.core.storage.dir.ExternalPublicStorageDirectoryProvider;
+import com.lularoe.erinfetz.core.storage.dir.InternalStorageDirectoryProvider;
+import com.lularoe.erinfetz.core.storage.files.DefaultFileInfoProvider;
+import com.lularoe.erinfetz.core.storage.files.FileInfoProvider;
+import com.lularoe.erinfetz.core.storage.files.MediaType;
+import com.lularoe.erinfetz.core.storage.files.StoredFile;
+import com.lularoe.erinfetz.core.storage.perms.DefaultUriPermissionsProvider;
+import com.lularoe.erinfetz.core.storage.perms.UriPermissionsProvider;
+import com.lularoe.erinfetz.core.ui.SnackbarManager;
+import com.lularoe.erinfetz.imagecapture.products.ProductInfo;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,18 +59,26 @@ public class MainActivity extends AppCompatActivity {
     private Products products;
     private InventoryImageMaker imageMaker;
     private StorageService storage;
+    private UriPermissionsProvider uriPermissionsProvider;
+    private IntentManager intentManager;
+    private SnackbarManager snackbarManager;
+    private MediaStoreManager mediaStoreManager;
 
-    private Spinner productStyleSpinner;
-    private Spinner productSizeSpinner;
-    private Button takePictureButton;
-    private ImageView mImageView;
-    private CheckBox mashupCheckBox;
-    private ConstraintLayout imageLayout;
-    private ConstraintLayout mainLayout;
+    @BindView(R.id.spinner1) Spinner productStyleSpinner;
+    @BindView(R.id.spinner2) Spinner productSizeSpinner;
+    @BindView(R.id.imageView1) ImageView mImageView;
+    @BindView(R.id.mashupCheckBox) CheckBox mashupCheckBox;
+
+    @BindView(R.id.imageLayout) ConstraintLayout imageLayout;
+    //@BindView(R.id.mainLayout1) ConstraintLayout mainLayout;
+
+    @BindView(R.id.takePicture) Button takePictureButton;
+    //@BindView(R.id.deletePicture) FloatingActionButton deletePictureButton;
+    //@BindView(R.id.acceptPicture) FloatingActionButton acceptPictureButton;
 
     private String currentProductStyle=null;
     private String currentProductSize=null;
-    private StoredImageFile mCurrentFile;
+    private StoredFile mCurrentFile;
 
     private static final String PRODUCT_STYLE_STORAGE_KEY = "productStyle";
     private static final String PRODUCT_SIZE_STORAGE_KEY = "productSize";
@@ -78,35 +95,56 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        imageMaker = new InventoryImageMaker(this);
-        storage = new StorageService(this);
+        ButterKnife.bind(this);
 
-        FloatingActionButton deletePictureButton = (FloatingActionButton) findViewById(R.id.deletePicture);
-        FloatingActionButton acceptPictureButton = (FloatingActionButton) findViewById(R.id.acceptPicture);
-        mImageView = (ImageView) findViewById(R.id.imageView1);
-        productStyleSpinner = (Spinner) findViewById(R.id.spinner1);
-        productSizeSpinner = (Spinner) findViewById(R.id.spinner2);
+        this.imageMaker = new InventoryImageMaker(this);
+        if(StorageService.isExternalMediaMounted()) {
+            this.storage = new StorageService(this, new ExternalPublicStorageDirectoryProvider(), new DefaultStorageUriProvider(this, getString(R.string.fileProvider)));
+        }else{
+            this.storage = new StorageService(this, new InternalStorageDirectoryProvider(this), new DefaultStorageUriProvider(this, getString(R.string.fileProvider)));
+        }
+        this.uriPermissionsProvider=new DefaultUriPermissionsProvider(this);
+        this.intentManager = new IntentManager(this);
+        this.snackbarManager = new SnackbarManager(findViewById(R.id.mainLayout1), getResources());
+        this.mediaStoreManager = new MediaStoreManager(this.getContentResolver());
+        //FloatingActionButton deletePictureButton = (FloatingActionButton) findViewById(R.id.deletePicture);
+        //FloatingActionButton acceptPictureButton = (FloatingActionButton) findViewById(R.id.acceptPicture);
+        //mImageView = (ImageView) findViewById(R.id.imageView1);
+        //productStyleSpinner = (Spinner) findViewById(R.id.spinner1);
+        //productSizeSpinner = (Spinner) findViewById(R.id.spinner2);
 
-        products = new Products(getResources());
+        this.products = new Products(getResources());
 
-        takePictureButton = (Button) findViewById(R.id.takePicture);
-        setBtnListenerOrDisable(
-                takePictureButton,
-                mTakePicOnClickListener,
-                MediaStore.ACTION_IMAGE_CAPTURE
-        );
+        //takePictureButton = (Button) findViewById(R.id.takePicture);
+//        setBtnListenerOrDisable(
+//                takePictureButton,
+//                mTakePicOnClickListener,
+//                MediaStore.ACTION_IMAGE_CAPTURE
+//        );
 
-        mashupCheckBox = (CheckBox) findViewById(R.id.mashupCheckBox);
+        //mashupCheckBox = (CheckBox) findViewById(R.id.mashupCheckBox);
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, products.styles());
+
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        productStyleSpinner.setAdapter(dataAdapter);
+        productStyleSpinner.setClickable(true);
 
         productStyleSpinner.setOnItemSelectedListener(mProductStyleListener);
         productSizeSpinner.setOnItemSelectedListener(mProductSizeListener);
-        deletePictureButton.setOnClickListener(mDeleteClickListener);
-        acceptPictureButton.setOnClickListener(mAcceptClickListener);
+        //deletePictureButton.setOnClickListener(mDeleteClickListener);
+        //acceptPictureButton.setOnClickListener(mAcceptClickListener);
+        //takePictureButton.setOnClickListener(mTakePicOnClickListener);
 
-        imageLayout = (ConstraintLayout) findViewById(R.id.imageLayout);
+        //imageLayout = (ConstraintLayout) findViewById(R.id.imageLayout);
         imageLayout.setVisibility(View.INVISIBLE);
 
-        mainLayout= (ConstraintLayout) findViewById(R.id.mainLayout1);
+        //mainLayout= (ConstraintLayout) findViewById(R.id.mainLayout1);
+
+        if(!intentManager.isIntentAvailable(MediaStore.ACTION_IMAGE_CAPTURE)){
+            takePictureButton.setClickable(false);
+        }
 
         checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERM, getString(R.string.message_perm_storage));
         checkPermissions(Manifest.permission.CAMERA, CAMERA_PERM, getString(R.string.message_perm_camera));
@@ -129,13 +167,16 @@ public class MainActivity extends AppCompatActivity {
         setPic();
     }
 
-    private void checkPermissions(final String perm, final int code, final String message){
-        if (ContextCompat.checkSelfPermission(this,
-                perm)
-                != PackageManager.PERMISSION_GRANTED) {
+    static final ButterKnife.Setter<View, Boolean> CLICKABLE = new ButterKnife.Setter<View, Boolean>() {
+        @Override public void set(@NonNull View view, Boolean value, int index) {
+            view.setClickable(value);
+        }
+    };
 
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    perm)) {
+    private void checkPermissions(final String perm, final int code, final String message){
+        if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, perm)) {
                 showMessageOKCancel(message,
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -150,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[] {perm},
                     code);
-            return;
         }
     }
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
@@ -161,37 +201,41 @@ public class MainActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-       int tpp = requestCode;
-        if(tpp==STORAGE_PERM) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
 
-                Snackbar.make(mainLayout, "Storage Permissions Granted.", Snackbar.LENGTH_SHORT).show();
-
+        if(requestCode==STORAGE_PERM) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                snackbarManager.show(R.string.message_storage_permission_granted);
             } else {
-                Snackbar.make(mainLayout, "No Permissions", Snackbar.LENGTH_SHORT).show();
+                snackbarManager.show(R.string.message_no_storage_permission);
+                disableUI();
             }
-        }else if (tpp == CAMERA_PERM){
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        }else if (requestCode == CAMERA_PERM){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                Snackbar.make(mainLayout, "Camera Permissions Granted.", Snackbar.LENGTH_SHORT).show();
+                snackbarManager.show(R.string.message_camera_permission_granted);
 
             }else{
-                Snackbar.make(mainLayout, "No Permissions", Snackbar.LENGTH_SHORT).show();
+                snackbarManager.show(R.string.message_no_camera_permission);
+                disableUI();
             }
         }else{
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-
-
     }
 
-    private void dispatchTakePictureIntent() {
+    private void disableUI(){
+        takePictureButton.setClickable(false);
+        productSizeSpinner.setClickable(false);
+        productStyleSpinner.setClickable(false);
+    }
+
+    @OnClick(R.id.takePicture)
+    void dispatchTakePictureIntent() {
         try {
+            ButterKnife.apply(takePictureButton, CLICKABLE, false);
             mCurrentFile = null;
             mImageView.setImageBitmap(null);
             imageLayout.setVisibility(View.INVISIBLE);
@@ -200,19 +244,20 @@ public class MainActivity extends AppCompatActivity {
             // Ensure that there's a camera activity to handle the intent
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 // Create the File where the photo should go
-                StoredImageFile photoFile = null;
+                StoredFile photoFile = null;
+
                 try {
-                    photoFile = storage.createImageFile(Environment.DIRECTORY_PICTURES,
-                            getString(R.string.album_name),
-                            products.shortName(currentProductStyle),
-                            currentProductSize);
-                } catch (IOException ex) {
+                    photoFile = storage.createFile(fileInfoProvider, MediaType.IMAGE_JPEG, Environment.DIRECTORY_PICTURES,getString(R.string.album_name));
+
+                } catch (IllegalAccessException | IOException ex){
                     Log.e(TAG, ex.getMessage(), ex);
+                    snackbarManager.indefiniteShow(ex.getMessage());
                 }
 
                 // Continue only if the File was successfully created
                 if (photoFile != null) {
                     mCurrentFile = photoFile;
+                    uriPermissionsProvider.grantReadWritePermissions(mCurrentFile.getUri(), takePictureIntent);
                     Log.v(TAG, mCurrentFile.getUri().toString());
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentFile.getUri());
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
@@ -220,9 +265,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Throwable e) {
             Log.e(TAG, e.getMessage(), e);
-            Snackbar.make(mainLayout, e.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
-
-            takePictureButton.setClickable(true);
+            snackbarManager.indefiniteShow(e.getMessage());
+            ButterKnife.apply(takePictureButton, CLICKABLE, true);
         }
     }
 
@@ -243,11 +287,11 @@ public class MainActivity extends AppCompatActivity {
 
             this.imageMaker.createStandardImage(mCurrentFile, currentProductStyle, currentProductSize);
             setPic();
-            //MediaScannerUtils.scanMediaIntentBroadcast(this, mCurrentFile);
-            MediaScannerUtils.scanMediaBroadcast(this, mCurrentFile);
+
+            mediaStoreManager.insert(mCurrentFile);
             //mCurrentPhotoPath = null;
 
-            takePictureButton.setClickable(true);
+            ButterKnife.apply(takePictureButton, CLICKABLE, true);
         }
     }
 
@@ -267,29 +311,31 @@ public class MainActivity extends AppCompatActivity {
             }else{
 
                 mImageView.setImageBitmap(null);
-                imageLayout.setVisibility(View.VISIBLE);
+                imageLayout.setVisibility(View.INVISIBLE);
             }
         }catch(Throwable e){
             Log.e(TAG, e.getMessage(),e);
+            snackbarManager.indefiniteShow(e.getMessage());
         }
     }
 
-    private void acceptCurrentPicture(){
+    @OnClick(R.id.acceptPicture)
+    void acceptCurrentPicture(){
         mCurrentFile=null;
         mImageView.setImageBitmap(null);
         imageLayout.setVisibility(View.INVISIBLE);
     }
 
-    private void deleteCurrentPicture(){
+    @OnClick(R.id.deletePicture)
+    void deleteCurrentPicture(){
         if (mCurrentFile != null) {
             File f = mCurrentFile.getFile();
             if(f.exists()){
                 if(f.delete()){
-                    Snackbar.make(mainLayout, "Previous file deleted.", Snackbar.LENGTH_SHORT).show();
-                    MediaScannerUtils.scanMediaBroadcast(this, mCurrentFile);
+                    snackbarManager.show(R.string.message_file_deleted);
+                    this.mediaStoreManager.delete(mCurrentFile.getFile());
                 }else{
-                    Snackbar.make(mainLayout, "File unable to be deleted! " +
-                            mCurrentFile.getFile().getAbsolutePath(), Snackbar.LENGTH_SHORT).show();
+                    snackbarManager.longShow(getString(R.string.message_file_not_deleted) + " " + mCurrentFile.getFile().getAbsolutePath());
                 }
             }
 
@@ -333,10 +379,75 @@ public class MainActivity extends AppCompatActivity {
                 takePictureButton.setClickable(false);
             }
         }else {
-
             takePictureButton.setClickable(true);
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_about) {
+            return true;
+        }
+        if (id == R.id.action_outfit) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean emptySize(String size){
+        if(Strings.isNullOrEmpty(size)){
+            return true;
+        }
+        if(size.equals(getString(R.string.size_NA))){
+            return true;
+        }
+        return false;
+    }
+
+    FileInfoProvider fileInfoProvider = new DefaultFileInfoProvider(){
+
+        @Override
+        public FileInfo provide() {
+
+            Date date = new Date();
+
+            ProductInfo p = products.get(currentProductStyle);
+
+            String timeStamp = dateFormat.format(date);
+            String product = p.getName().getShortName();
+            String size = currentProductSize;
+
+            String imageFileName = emptySize(size)?
+                    String.format("%s_%s", product, timeStamp) :
+                    String.format("%s_%s_%s", product, size, timeStamp);
+
+            return new DefaultFileInfo(imageFileName,
+                    ContentValuesBuilder.start()
+                            .title(p.title(currentProductSize, date))
+                            .displayName(p.displayName(currentProductSize, date))
+                            .description(p.description(currentProductSize, date))
+                            .other("productStyle", p.getName().getName())
+                            .other("productSize", currentProductSize)
+                            .other("productPrice", p.getPrice().toString())
+                            .dateTaken(date));
+        }
+    };
 
     AdapterView.OnItemSelectedListener mProductStyleListener=new AdapterView.OnItemSelectedListener(){
         @Override
@@ -365,78 +476,31 @@ public class MainActivity extends AppCompatActivity {
             setCurrentProductSize(null);
         }
     };
+//    Button.OnClickListener mTakePicOnClickListener =
+//            new Button.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    takePictureButton.setClickable(false);
+//                    dispatchTakePictureIntent();
+//                    //dispatchTakePictureIntent2();
+//                }
+//            };
 
-    Button.OnClickListener mTakePicOnClickListener =
-            new Button.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    takePictureButton.setClickable(false);
-                    dispatchTakePictureIntent();
-                    //dispatchTakePictureIntent2();
-                }
-            };
+//    Button.OnClickListener mDeleteClickListener =
+//            new Button.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    deleteCurrentPicture();
+//                }
+//            };
+//
+//
+//    Button.OnClickListener mAcceptClickListener =
+//            new Button.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    acceptCurrentPicture();
+//                }
+//            };
 
-    Button.OnClickListener mDeleteClickListener =
-            new Button.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    deleteCurrentPicture();
-                }
-            };
-
-
-    Button.OnClickListener mAcceptClickListener =
-            new Button.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    acceptCurrentPicture();
-                }
-            };
-
-    private void setBtnListenerOrDisable(Button btn, Button.OnClickListener onClickListener, String intentName) {
-        if (isIntentAvailable(this, intentName)) {
-            btn.setOnClickListener(onClickListener);
-        } else {
-            btn.setClickable(false);
-        }
-    }
-
-    public static boolean isIntentAvailable(Context context, String action) {
-        final PackageManager packageManager = context.getPackageManager();
-        final Intent intent = new Intent(action);
-        List<ResolveInfo> list =
-                packageManager.queryIntentActivities(intent,
-                        PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        if (id == R.id.action_about) {
-            return true;
-        }
-        if (id == R.id.action_mashup) {
-            return true;
-        }
-        if (id == R.id.action_outfit) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

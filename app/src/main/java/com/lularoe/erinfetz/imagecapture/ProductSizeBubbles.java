@@ -17,7 +17,7 @@ public class ProductSizeBubbles {
     private static final String TAG = ProductSizeBubbles.class.getSimpleName();
 
     //private static final int FONT_SIZE = 174;
-    private static final int FONT_SIZE = 200;
+    private static final int FONT_SIZE = 204;
 
     private static ProductSizeBubbles INSTANCE;
     private final Random random;
@@ -71,6 +71,7 @@ public class ProductSizeBubbles {
             Canvas canvas = new Canvas(bitmap);
             // new antialised Paint
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setTypeface(font);
             // text color - #3D3D3D
             paint.setColor(Color.BLACK);
             // text size in pixels

@@ -39,7 +39,7 @@ public class ProductPriceImages{
             return getImage(R.drawable.carly_map1);
         }else if(productStyle.equals("Cassie")){
             return getImage(R.drawable.cassie_map1);
-        }else if(productStyle.equals("Classic T")){
+        }else if(productStyle.equals("Classic Tee")){
             return getImage(R.drawable.classict_map1);
         }else if(productStyle.equals("Gracie")){
             return getImage(R.drawable.gracie_map1);
@@ -89,7 +89,7 @@ public class ProductPriceImages{
             return getImage(R.drawable.nicole_map1);
         }else if(productStyle.equals("Patrick")){
             return getImage(R.drawable.patrick_map);
-        }else if(productStyle.equals("Perfect T")){
+        }else if(productStyle.equals("Perfect Tee")){
             return getImage(R.drawable.perfectt_map1);
         }else if(productStyle.equals("Randy")){
             return getImage(R.drawable.randy_map1);

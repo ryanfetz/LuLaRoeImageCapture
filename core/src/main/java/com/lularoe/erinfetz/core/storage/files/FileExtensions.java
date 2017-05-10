@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.Map;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -67,5 +68,15 @@ public class FileExtensions {
      */
     public String toFileExtension(MediaType mediatype) {
         return mediaTypeToExtension.get(mediatype);
+    }
+    public String toFileExtension(MediaType mediatype, boolean includePeriod) {
+        String ext = mediaTypeToExtension.get(mediatype);
+        if(Strings.isNullOrEmpty(ext)){
+            return null;
+        }
+        if(includePeriod){
+            return "."+ext;
+        }
+        return ext;
     }
 }

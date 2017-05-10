@@ -3,10 +3,17 @@
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
 
+    <string name="fileProvider">com.lularoe.erinfetz.imagecapture.fileprovider</string>
 
     <string name="album_name">LuLaRoeProductImages</string>
     <string name="message_perm_storage">You need to allow access to storage.</string>
     <string name="message_perm_camera">You need to allow access to camera.</string>
+    <string name="message_file_deleted">Previous file deleted.</string>
+    <string name="message_file_not_deleted">File unable to be deleted!</string>
+    <string name="message_camera_permission_granted">Camera Permissions Granted.</string>
+    <string name="message_storage_permission_granted">File Storage Permissions Granted.</string>
+    <string name="message_no_camera_permission">No Camera Permissions</string>
+    <string name="message_no_storage_permission">No Storage Permissions</string>
 
     <string name="action_TakePicture">Take Picture</string>
     <string name="action_TakeOutfitPicture">Outfit Picture</string>
@@ -102,10 +109,4 @@
     <string name="product_MNM_Leggings_TC">Mommy &amp; Me - TC</string>
     <string name="product_MNM_Leggings_Kids_SM">Mommy &amp; Me - Kids S/M</string>
     <string name="product_MNM_Leggings_Kids_LXL">Mommy &amp; Me - Kids L/XL</string>
-
-    <string name="title_activity_camera">Camera</string>
-    <string name="picture">Picture</string>
-    <string name="description_info">Info</string>
-    <string name="request_permission">This sample needs camera permission.</string>
-    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
 </resources>

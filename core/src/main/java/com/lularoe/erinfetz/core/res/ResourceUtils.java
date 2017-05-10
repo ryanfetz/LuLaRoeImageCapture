@@ -14,11 +14,12 @@ public class ResourceUtils {
     private static final String TAG = ResourceUtils.class.getSimpleName();
     public static Map<String,String> getHashMapResource(Context c, int hashMapResId) {
         Map<String,String> map = null;
-        XmlResourceParser parser = c.getResources().getXml(hashMapResId);
+        XmlResourceParser parser = null;
 
         String key = null, value = null;
 
         try {
+            parser = c.getResources().getXml(hashMapResId);
             int eventType = parser.getEventType();
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -53,6 +54,10 @@ public class ResourceUtils {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(),e);
             return null;
+        }finally{
+            if(parser!=null){
+                parser.close();
+            }
         }
 
         return map;

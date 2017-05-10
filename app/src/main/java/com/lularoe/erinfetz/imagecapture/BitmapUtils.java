@@ -2,13 +2,11 @@ package com.lularoe.erinfetz.imagecapture;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.widget.ImageView;
 
-import com.lularoe.erinfetz.imagecapture.storage.StoredImageFile;
+import com.lularoe.erinfetz.core.storage.files.StoredFile;
 
 import java.io.IOException;
 
@@ -17,7 +15,7 @@ public class BitmapUtils {
 
     }
 
-    public static Bitmap loadForView(ImageView imageView, StoredImageFile file){
+    public static Bitmap loadForView(ImageView imageView, StoredFile file){
         /* Get the size of the ImageView */
         int targetW = imageView.getWidth();
         int targetH = imageView.getHeight();

@@ -1,6 +1,6 @@
 package com.lularoe.erinfetz.core.storage.files;
 
-import android.content.Context;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,21 +8,29 @@ import android.support.annotation.NonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.lularoe.erinfetz.core.ContentValuesBuilder;
 import com.lularoe.erinfetz.core.storage.dir.StorageDirectory;
 
 import java.io.File;
+import java.util.Date;
 
 public class StoredFile implements Parcelable {
     private final StorageDirectory directory;
     private final File file;
     private final MediaType mediaType;
     private final Uri uri;
+    private final ContentValues metadata;
 
-    public StoredFile(@NonNull StorageDirectory d, @NonNull File f, @NonNull MediaType mediaType, @NonNull Uri uri){
+    public StoredFile(@NonNull StorageDirectory d, @NonNull File f, @NonNull MediaType mediaType, @NonNull Uri uri, @NonNull ContentValues metadata){
         this.directory = d;
         this.mediaType = mediaType;
         this.file = f;
         this.uri = uri;
+        this.metadata = metadata;
+    }
+    public StoredFile(@NonNull StorageDirectory d, @NonNull File f, @NonNull MediaType mediaType, @NonNull Uri uri, @NonNull ContentValuesBuilder metadata){
+
+        this(d, f, mediaType, uri, metadata.filePath(f.getAbsolutePath()).mimeType(mediaType).build());
     }
 
     public MediaType getMediaType() {
@@ -39,6 +47,8 @@ public class StoredFile implements Parcelable {
         return file;
     }
 
+    public ContentValues getMetadata(){return metadata;}
+
     public final String getAbsolutePath(){
         return getFile().getAbsolutePath();
     }
@@ -54,6 +64,7 @@ public class StoredFile implements Parcelable {
                 .add("mediaType", getMediaType())
                 .add("directory", getDirectory())
                 .add("uri", getUri())
+                .add("metadata", getMetadata())
                 .toString();
     }
 
@@ -68,13 +79,14 @@ public class StoredFile implements Parcelable {
         return Objects.equal(directory, that.directory) &&
                 Objects.equal(uri, that.directory) &&
                 Objects.equal(file, that.file) &&
-                Objects.equal(mediaType, that.mediaType);
+                Objects.equal(mediaType, that.mediaType)&&
+                Objects.equal(metadata, that.metadata);
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getClass().getSimpleName(), directory, uri, file, mediaType);
+        return Objects.hashCode(getClass().getSimpleName(), directory, uri, file, mediaType, metadata);
     }
 
     @Override
@@ -88,6 +100,7 @@ public class StoredFile implements Parcelable {
         out.writeString(file.getAbsolutePath());
         out.writeParcelable(uri, flags);
         out.writeString(mediaType.toString());
+        out.writeParcelable(metadata,flags);
     }
 
     private StoredFile(Parcel in) {
@@ -95,6 +108,7 @@ public class StoredFile implements Parcelable {
         file = new File(in.readString());
         uri = in.readParcelable(Uri.class.getClassLoader());
         mediaType = MediaType.parse(in.readString());
+        metadata = in.readParcelable(ContentValues.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<StoredFile> CREATOR

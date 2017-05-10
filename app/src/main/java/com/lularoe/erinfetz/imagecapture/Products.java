@@ -3,94 +3,57 @@ package com.lularoe.erinfetz.imagecapture;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.lularoe.erinfetz.imagecapture.products.ProductInfo;
+import com.lularoe.erinfetz.imagecapture.products.ProductsResourceParser;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 
 public class Products {
 
-    private final Resources resources;
+    private final Map<String, ProductInfo> products;
 
     public Products(Resources res) {
-        resources=res;
+        products = ProductsResourceParser.getProducts(res, R.xml.products);
     }
 
     public List<String> styles(){
-        return this.arrayResource(R.array.product_styles);
+
+        List<String> s = Lists.newArrayList(products.keySet());
+        Collections.sort(s);
+        return s;
     }
 
-    @NonNull
-    private List<String> arrayResource(int id){
-        return Lists.newArrayList(resources.getStringArray(id));
-    }
-    @NonNull
-    private String stringResource(int id){
-        return resources.getString(id);
+    public ProductInfo get(@NonNull String name){
+        return products.get(name);
     }
 
-    public boolean hasSizes(String productStyle){
-        if(arrayResource(R.array.no_size).contains(productStyle)){
-            return false;
-        }
-
-        return true;
+    public boolean hasSizes(@NonNull String productStyle){
+        ProductInfo p = get(productStyle);
+        if(p==null)return false;
+        return p.hasSizes();
     }
 
-    public List<String> sizes(String productStyle){
-        if(arrayResource(R.array.no_size).contains(productStyle)){
-            return Lists.newArrayList(stringResource(R.string.size_NA));
+    public List<String> sizes(@NonNull String productStyle){
+        ProductInfo p = get(productStyle);
+        if(p==null){
+            return null;
         }
-
-        if(stringResource(R.string.product_Bianka).equals(productStyle)){
-            return arrayResource(R.array.bianka_sizes);
-        }
-
-        if(arrayResource(R.array.kids_styles).contains(productStyle)){
-            return filter(arrayResource(R.array.default_kid_sizes), productStyle, R.array.no_14_sizes, R.string.size_14);
-        }
-
-
-        List<String> sizes = arrayResource(R.array.default_adult_sizes);
-        sizes = filter(sizes, productStyle, R.array.no_xxs, R.string.size_XXS);
-        sizes = filter(sizes, productStyle, R.array.no_xs, R.string.size_XS);
-        sizes = filter(sizes, productStyle, R.array.no_s, R.string.size_S);
-        sizes = filter(sizes, productStyle, R.array.no_m, R.string.size_M);
-        sizes = filter(sizes, productStyle, R.array.no_xl, R.string.size_XL);
-        sizes = filter(sizes, productStyle, R.array.no_2xl, R.string.size_2XL);
-        sizes = filter(sizes, productStyle, R.array.no_3xl, R.string.size_3XL);
-
-        return sizes;
+        return p.sizes();
     }
 
-    public String shortName(String productStyle){
-        if(!productStyle.contains(" ")){
-            return productStyle;
-        }
-
-        if(productStyle.contains("Mommy &amp; Me - ") || productStyle.contains("Mommy & Me - ")){
-            String s = productStyle.replace("Mommy &amp; Me - ","MNM_").replace("Mommy & Me - ","MNM_");
-            return s.replace(" ", "_").replace("/","");
-        }
-
-        if(productStyle.contains("Leggings - ")){
-            return productStyle.replace("Leggings - ", "Leggings_")
-                    .replace("&amp;", "_")
-                    .replace("&", "_")
-                    .replace(" ", "_")
-                    .replace("/","");
-        }
-
-        return productStyle
-                .replace(" - ", "_")
-                .replace("-", "_")
-                .replace(" ", "_")
-                .replace("/","");
+    public String shortName(@NonNull String productStyle){
+        ProductInfo p = get(productStyle);
+        if(p==null)return null;
+        return p.getName().getShortName();
     }
 
-    private List<String> filter(List<String> sizes, String productStyle, int listId, int itemId){
-        if(arrayResource(listId).contains(productStyle)){
-            sizes.remove(stringResource(itemId));
-        }
-        return sizes;
+    public int price(@NonNull String productStyle){
+        ProductInfo p = get(productStyle);
+        if(p==null)return 0;
+        return p.getPrice().get();
     }
 }

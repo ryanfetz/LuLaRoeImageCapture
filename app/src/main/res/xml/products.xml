@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?>
+<products>
+    <product>
+        <name value="Adeline"/>
+        <price value="30"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Amelia"/>
+        <price value="65"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Ana"/>
+        <price value="60"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Azure"/>
+        <price value="35"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Bianka"/>
+        <price value="28"/>
+        <sizes>
+            <size>1C</size>
+            <size>2C</size>
+            <size>3C</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Carly"/>
+        <price value="55"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Cassie"/>
+        <price value="35"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Classic Tee" short="Classic_T"/>
+        <price value="35"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Gracie"/>
+        <price value="28"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+            <size>14</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Irma"/>
+        <price value="35"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Jade"/>
+        <price value="55"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Jill"/>
+        <price value="55"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Jordan"/>
+        <price value="65"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Joy"/>
+        <price value="60"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Julia"/>
+        <price value="45"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Kids Azure" short="Kids_Azure"/>
+        <price value="25"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+            <size>14</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Leggings - Tween" short="Leggings_Tween"/>
+        <price value="23"/>
+    </product>
+    <product>
+        <name value="Leggings - One Size" short="Leggings_OS"/>
+        <price value="25"/>
+    </product>
+    <product>
+        <name value="Leggings - Tall &amp; Curvy" short="Leggings_TC"/>
+        <price value="25"/>
+    </product>
+    <product>
+        <name value="Leggings - Kids S/M" short="Leggings_Kids_SM"/>
+        <price value="23"/>
+    </product>
+    <product>
+        <name value="Leggings - Kids L/XL" short="Leggings_Kids_LXL"/>
+        <price value="23"/>
+    </product>
+    <product>
+        <name value="Lindsay"/>
+        <price value="48"/>
+        <sizes>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Lola"/>
+        <price value="46"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Lucy"/>
+        <price value="52"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Madison"/>
+        <price value="46"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mae"/>
+        <price value="30"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mark"/>
+        <price value="42"/>
+        <sizes>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Maxi"/>
+        <price value="42"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mimi"/>
+        <price value="75"/>
+    </product>
+    <product>
+        <name value="Monroe"/>
+        <price value="48"/>
+        <sizes>
+            <size>S</size>
+            <size>L</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Nicole"/>
+        <price value="48"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Patrick"/>
+        <price value="40"/>
+        <sizes>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Perfect Tee" short="Perfect_T"/>
+        <price value="36"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Randy"/>
+        <price value="35"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Sarah"/>
+        <price value="70"/>
+        <sizes>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Scarlett"/>
+        <price value="35"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Sloan"/>
+        <price value="28"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+            <size>14</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Gracie" short="MNM_Gracie"/>
+        <price value="32"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+            <size>14</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Irma" short="MNM_Irma"/>
+        <price value="39"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Adeline" short="MNM_Adeline"/>
+        <price value="34"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Nicole" short="MNM_Nicole"/>
+        <price value="52"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Scarlett" short="MNM_Scarlett"/>
+        <price value="39"/>
+        <sizes>
+            <size>2</size>
+            <size>4</size>
+            <size>6</size>
+            <size>8</size>
+            <size>10</size>
+            <size>12</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Carly" short="MNM_Carly"/>
+        <price value="59"/>
+        <sizes>
+            <size>XXS</size>
+            <size>XS</size>
+            <size>S</size>
+            <size>M</size>
+            <size>L</size>
+            <size>XL</size>
+            <size>2XL</size>
+            <size>3XL</size>
+        </sizes>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Tween" short="MNM_Leggings_Tween"/>
+        <price value="25"/>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - OS" short="MNM_Leggings_OS"/>
+        <price value="27"/>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - TC" short="MNM_Leggings_TC"/>
+        <price value="27"/>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Kids S/M" short="MNM_Leggings_Kids_SM"/>
+        <price value="25"/>
+    </product>
+    <product>
+        <name value="Mommy &amp; Me - Kids L/XL" short="MNM_Leggings_Kids_LXL"/>
+        <price value="25"/>
+    </product>
+</products>
