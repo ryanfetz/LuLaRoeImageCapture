@@ -41,12 +41,12 @@ public class InventoryImageMaker {
     }
 
     public void createStandardImage(StoredFile input, String currentProductStyle, String currentProductSize){
-
+        Bitmap bitmap =null;
         FileOutputStream outStream=null;
         try{
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
             bmOptions.inMutable=true;
-            Bitmap bitmap = BitmapFactory.decodeFile(input.getFile().getAbsolutePath(), bmOptions);
+            bitmap = BitmapFactory.decodeFile(input.getFile().getAbsolutePath(), bmOptions);
 
             bitmap = this.standard(input.getFile().getAbsolutePath(), bitmap, currentProductStyle, currentProductSize);
 
@@ -71,6 +71,12 @@ public class InventoryImageMaker {
             }catch(IOException e1){
 
                 Log.e(TAG, e1.getMessage(),e1);
+            }
+            try{
+                bitmap.recycle();
+            }catch(Throwable e){
+
+                Log.e(TAG, e.getMessage(),e);
             }
         }
     }

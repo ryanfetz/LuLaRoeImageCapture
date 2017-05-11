@@ -6,6 +6,7 @@ import com.lularoe.erinfetz.core.ContentValuesBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class DefaultFileInfoProvider implements FileInfoProvider {
     private final String prefix;
@@ -17,7 +18,7 @@ public class DefaultFileInfoProvider implements FileInfoProvider {
         this("");
     }
     public DefaultFileInfoProvider(String prefix){
-        this(prefix, new SimpleDateFormat(DATE_FORMAT));
+        this(prefix, new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()));
     }
     public DefaultFileInfoProvider(String prefix, SimpleDateFormat dateFormat){
         this.prefix = prefix;

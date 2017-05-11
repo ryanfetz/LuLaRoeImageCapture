@@ -77,6 +77,7 @@ public class ProductSizeBubbles {
             // text size in pixels
             paint.setTextSize((int) (FONT_SIZE * scale));
 
+
             // draw text to the Canvas center
             Rect bounds = new Rect();
             paint.getTextBounds(size, 0, size.length(), bounds);

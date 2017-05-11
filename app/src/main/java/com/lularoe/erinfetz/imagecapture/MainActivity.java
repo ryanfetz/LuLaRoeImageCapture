@@ -68,13 +68,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.spinner2) Spinner productSizeSpinner;
     @BindView(R.id.imageView1) ImageView mImageView;
     @BindView(R.id.mashupCheckBox) CheckBox mashupCheckBox;
-
     @BindView(R.id.imageLayout) ConstraintLayout imageLayout;
-    //@BindView(R.id.mainLayout1) ConstraintLayout mainLayout;
-
     @BindView(R.id.takePicture) Button takePictureButton;
-    //@BindView(R.id.deletePicture) FloatingActionButton deletePictureButton;
-    //@BindView(R.id.acceptPicture) FloatingActionButton acceptPictureButton;
 
     private String currentProductStyle=null;
     private String currentProductSize=null;
@@ -107,22 +102,8 @@ public class MainActivity extends AppCompatActivity {
         this.intentManager = new IntentManager(this);
         this.snackbarManager = new SnackbarManager(findViewById(R.id.mainLayout1), getResources());
         this.mediaStoreManager = new MediaStoreManager(this.getContentResolver());
-        //FloatingActionButton deletePictureButton = (FloatingActionButton) findViewById(R.id.deletePicture);
-        //FloatingActionButton acceptPictureButton = (FloatingActionButton) findViewById(R.id.acceptPicture);
-        //mImageView = (ImageView) findViewById(R.id.imageView1);
-        //productStyleSpinner = (Spinner) findViewById(R.id.spinner1);
-        //productSizeSpinner = (Spinner) findViewById(R.id.spinner2);
 
         this.products = new Products(getResources());
-
-        //takePictureButton = (Button) findViewById(R.id.takePicture);
-//        setBtnListenerOrDisable(
-//                takePictureButton,
-//                mTakePicOnClickListener,
-//                MediaStore.ACTION_IMAGE_CAPTURE
-//        );
-
-        //mashupCheckBox = (CheckBox) findViewById(R.id.mashupCheckBox);
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products.styles());
@@ -133,14 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
         productStyleSpinner.setOnItemSelectedListener(mProductStyleListener);
         productSizeSpinner.setOnItemSelectedListener(mProductSizeListener);
-        //deletePictureButton.setOnClickListener(mDeleteClickListener);
-        //acceptPictureButton.setOnClickListener(mAcceptClickListener);
-        //takePictureButton.setOnClickListener(mTakePicOnClickListener);
 
-        //imageLayout = (ConstraintLayout) findViewById(R.id.imageLayout);
         imageLayout.setVisibility(View.INVISIBLE);
-
-        //mainLayout= (ConstraintLayout) findViewById(R.id.mainLayout1);
 
         if(!intentManager.isIntentAvailable(MediaStore.ACTION_IMAGE_CAPTURE)){
             takePictureButton.setClickable(false);
@@ -149,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERM, getString(R.string.message_perm_storage));
         checkPermissions(Manifest.permission.CAMERA, CAMERA_PERM, getString(R.string.message_perm_camera));
     }
+
     // Some lifecycle callbacks so that the image can survive orientation change
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -236,9 +212,7 @@ public class MainActivity extends AppCompatActivity {
     void dispatchTakePictureIntent() {
         try {
             ButterKnife.apply(takePictureButton, CLICKABLE, false);
-            mCurrentFile = null;
-            mImageView.setImageBitmap(null);
-            imageLayout.setVisibility(View.INVISIBLE);
+            acceptCurrentPicture();
 
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // Ensure that there's a camera activity to handle the intent
@@ -286,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         if (mCurrentFile != null) {
 
             this.imageMaker.createStandardImage(mCurrentFile, currentProductStyle, currentProductSize);
+
             setPic();
 
             mediaStoreManager.insert(mCurrentFile);
