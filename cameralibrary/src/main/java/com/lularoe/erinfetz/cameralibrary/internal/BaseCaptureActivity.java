@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.lularoe.erinfetz.cameralibrary.CameraManager;
+import com.lularoe.erinfetz.cameralibrary.CameraActivityManager;
 import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.TimeLimitReachedException;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
@@ -294,7 +294,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
             setRecordingStart(-1);
         if (getIntent().getBooleanExtra(CameraIntentKey.RETRY_EXITS, false)) {
             setResult(RESULT_OK, new Intent()
-                    .putExtra(CameraManager.STATUS_EXTRA, CameraManager.STATUS_RETRY));
+                    .putExtra(CameraActivityManager.STATUS_EXTRA, CameraActivityManager.STATUS_RETRY));
             finish();
             return;
         }
@@ -307,7 +307,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     public final void onShowPreview(@Nullable final String outputUri, boolean countdownIsAtZero) {
         if ((shouldAutoSubmit() && (countdownIsAtZero || !allowRetry() || !hasLengthLimit())) || outputUri == null) {
             if (outputUri == null) {
-                setResult(RESULT_CANCELED, new Intent().putExtra(CameraManager.ERROR_EXTRA,
+                setResult(RESULT_CANCELED, new Intent().putExtra(CameraActivityManager.ERROR_EXTRA,
                         new TimeLimitReachedException()));
                 finish();
                 return;
@@ -385,7 +385,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
     public final void useMedia(String uri) {
         if (uri != null) {
             setResult(Activity.RESULT_OK, getIntent()
-                    .putExtra(CameraManager.STATUS_EXTRA, CameraManager.STATUS_RECORDED)
+                    .putExtra(CameraActivityManager.STATUS_EXTRA, CameraActivityManager.STATUS_RECORDED)
                     .setDataAndType(Uri.parse(uri), useStillshot() ? "image/jpeg" : "video/mp4"));
         }
         finish();
