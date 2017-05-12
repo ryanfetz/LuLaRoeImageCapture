@@ -72,12 +72,6 @@ public class InventoryImageMaker {
 
                 Log.e(TAG, e1.getMessage(),e1);
             }
-            try{
-                bitmap.recycle();
-            }catch(Throwable e){
-
-                Log.e(TAG, e.getMessage(),e);
-            }
         }
     }
 

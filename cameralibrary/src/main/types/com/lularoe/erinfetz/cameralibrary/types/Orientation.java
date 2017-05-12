@@ -1,18 +1,14 @@
 package com.lularoe.erinfetz.cameralibrary.types;
 
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.view.Surface;
-import android.view.WindowManager;
+
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import static com.lularoe.erinfetz.core.media.Degrees.*;
 
 public class Orientation {
     private Orientation(){
@@ -22,17 +18,6 @@ public class Orientation {
             ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ActivityOrientation {
-    }
-
-    public static final int DEGREES_0 = 0;
-    public static final int DEGREES_90 = 90;
-    public static final int DEGREES_180 = 180;
-    public static final int DEGREES_270 = 270;
-    public static final int DEGREES_360 = 360;
-
-    @IntDef({DEGREES_0, DEGREES_90, DEGREES_180, DEGREES_270, DEGREES_360})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DegreeUnits {
     }
 
     public static final int SENSOR_POSITION_UP = DEGREES_90;

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="core-unspecified">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/core/build/intermediates/bundles/default/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/core/build/intermediates/bundles/default/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

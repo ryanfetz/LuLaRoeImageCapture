@@ -1,14 +1,27 @@
-package com.lularoe.erinfetz.core.utils;
+package com.lularoe.erinfetz.core.media;
 
-import com.lularoe.erinfetz.cameralibrary.types.Orientation;
-import static com.lularoe.erinfetz.cameralibrary.types.Orientation.*;
+import android.support.annotation.IntDef;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class Degrees {
     private Degrees(){
 
     }
-    @Orientation.DegreeUnits
-    public static int mirror(@Orientation.DegreeUnits int orientation) {
+
+    public static final int DEGREES_0 = 0;
+    public static final int DEGREES_90 = 90;
+    public static final int DEGREES_180 = 180;
+    public static final int DEGREES_270 = 270;
+    public static final int DEGREES_360 = 360;
+
+    @IntDef({DEGREES_0, DEGREES_90, DEGREES_180, DEGREES_270, DEGREES_360})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DegreeUnits {
+    }
+
+    @DegreeUnits
+    public static int mirror(@DegreeUnits int orientation) {
         switch (orientation) {
             case DEGREES_0:
             case DEGREES_360:
@@ -24,8 +37,8 @@ public class Degrees {
     }
 
     @SuppressWarnings("ResourceType")
-    @Orientation.DegreeUnits
-    public static int naturalize(@Orientation.DegreeUnits int orientation) {
+    @DegreeUnits
+    public static int naturalize(@DegreeUnits int orientation) {
         if (orientation == DEGREES_360)
             orientation = DEGREES_0;
         else if (orientation > DEGREES_360) {

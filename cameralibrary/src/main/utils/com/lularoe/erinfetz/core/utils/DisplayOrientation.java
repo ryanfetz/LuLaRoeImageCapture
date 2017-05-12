@@ -10,14 +10,16 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.lularoe.erinfetz.cameralibrary.types.Orientation;
-import static com.lularoe.erinfetz.cameralibrary.types.Orientation.*;
+import com.lularoe.erinfetz.core.media.Degrees;
+
+import static com.lularoe.erinfetz.core.media.Degrees.*;
 
 public class DisplayOrientation {
 
     private DisplayOrientation(){
 
     }
-    @Orientation.DegreeUnits
+    @DegreeUnits
     public static int getDisplayRotation(@NonNull Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         int rotation = windowManager.getDefaultDisplay().getRotation();
@@ -36,8 +38,8 @@ public class DisplayOrientation {
 
 
     @SuppressWarnings("ResourceType")
-    @Orientation.DegreeUnits
-    public static int getDisplayOrientation(@Orientation.DegreeUnits int sensorOrientation, @Orientation.DegreeUnits int displayOrientation, boolean front) {
+    @DegreeUnits
+    public static int getDisplayOrientation(@DegreeUnits int sensorOrientation, @DegreeUnits int displayOrientation, boolean front) {
         final boolean isLandscape = isLandscape(displayOrientation);
         if (displayOrientation == DEGREES_0)
             displayOrientation = DEGREES_360;
@@ -67,7 +69,7 @@ public class DisplayOrientation {
 
     @Orientation.ActivityOrientation
     public static int getActivityOrientation(@NonNull Activity context) {
-        @Orientation.DegreeUnits
+        @DegreeUnits
         final int rotation = getDisplayRotation(context);
         switch (rotation) {
             case DEGREES_0:
@@ -93,11 +95,11 @@ public class DisplayOrientation {
         return isLandscape(getDisplayRotation(activity));
     }
 
-    public static boolean isPortrait(@Orientation.DegreeUnits int degrees) {
+    public static boolean isPortrait(@DegreeUnits int degrees) {
         return degrees == DEGREES_0 || degrees == DEGREES_180 || degrees == DEGREES_360;
     }
 
-    private static boolean isLandscape(@Orientation.DegreeUnits int degrees) {
+    private static boolean isLandscape(@DegreeUnits int degrees) {
         return degrees == DEGREES_90 || degrees == DEGREES_270;
     }
 }

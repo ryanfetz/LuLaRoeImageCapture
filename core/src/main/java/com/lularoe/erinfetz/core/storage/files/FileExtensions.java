@@ -1,12 +1,13 @@
 package com.lularoe.erinfetz.core.storage.files;
 
 import android.content.Context;
+import android.net.Uri;
+import android.webkit.MimeTypeMap;
 
 import java.util.Map;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.lularoe.erinfetz.core.R;
@@ -42,7 +43,39 @@ public class FileExtensions {
      */
     public MediaType toMediaType(String ext) {
         ext = CharMatcher.is('.').removeFrom(ext).toLowerCase();
-        return extensionToMediaType.get(ext);
+        MediaType m = extensionToMediaType.get(ext);
+        return m==null?mimeTypeForExtension(ext):m;
+    }
+
+    private static MediaType mimeTypeForExtension(String ext){
+        ext = CharMatcher.is('.').removeFrom(ext).toLowerCase();
+
+        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+
+        if(Strings.isNullOrEmpty(type)){
+            return null;
+        }
+        return MediaType.parse(type);
+    }
+    private static MediaType getMimeType(String url) {
+        String type = "";
+
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (!Strings.isNullOrEmpty(extension)) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        } else {
+            String reCheckExtension = MimeTypeMap.getFileExtensionFromUrl(url.replaceAll("\\s+", ""));
+            if (!Strings.isNullOrEmpty(reCheckExtension)) {
+                type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(reCheckExtension);
+            }
+        }
+        if(Strings.isNullOrEmpty(type)){
+            return null;
+        }
+        return MediaType.parse(type);
+    }
+    private static String getFileExtension(MediaType type){
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(type.withoutParameters());
     }
 
     /**
@@ -55,7 +88,7 @@ public class FileExtensions {
      */
     public MediaType toMediaTypeFromFileName(String name) {
         String ext = Files.getFileExtension(name);
-        return extensionToMediaType.get(ext.toLowerCase());
+        return toMediaType(ext.toLowerCase());
     }
 
     /**
@@ -67,10 +100,11 @@ public class FileExtensions {
      * @return
      */
     public String toFileExtension(MediaType mediatype) {
-        return mediaTypeToExtension.get(mediatype);
+        String f= mediaTypeToExtension.get(mediatype);
+        return Strings.isNullOrEmpty(f)?getFileExtension(mediatype):f;
     }
     public String toFileExtension(MediaType mediatype, boolean includePeriod) {
-        String ext = mediaTypeToExtension.get(mediatype);
+        String ext = toFileExtension(mediatype);
         if(Strings.isNullOrEmpty(ext)){
             return null;
         }
