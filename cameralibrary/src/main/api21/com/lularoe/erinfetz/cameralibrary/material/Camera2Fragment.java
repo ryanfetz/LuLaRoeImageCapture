@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.material;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -43,6 +43,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.internal.AutoFitTextureView;
+import com.lularoe.erinfetz.cameralibrary.internal.BaseCameraFragment;
+import com.lularoe.erinfetz.cameralibrary.internal.CameraIntentKey;
+import com.lularoe.erinfetz.cameralibrary.internal.VideoStreamView;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -59,12 +63,12 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_FRONT;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_OFF;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_FRONT;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
 
 /**
  *
@@ -148,19 +152,19 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
             String errorMsg = "Unknown camera error";
             switch (error) {
                 case CameraDevice.StateCallback.ERROR_CAMERA_IN_USE:
-                    errorMsg = "Camera is already in use.";
+                    errorMsg = "Cameras is already in use.";
                     break;
                 case CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE:
                     errorMsg = "Max number of cameras are open, close previous cameras first.";
                     break;
                 case CameraDevice.StateCallback.ERROR_CAMERA_DISABLED:
-                    errorMsg = "Camera is disabled, e.g. due to device policies.";
+                    errorMsg = "Cameras is disabled, e.g. due to device policies.";
                     break;
                 case CameraDevice.StateCallback.ERROR_CAMERA_DEVICE:
-                    errorMsg = "Camera device has encountered a fatal error, please try again.";
+                    errorMsg = "Cameras device has encountered a fatal error, please try again.";
                     break;
                 case CameraDevice.StateCallback.ERROR_CAMERA_SERVICE:
-                    errorMsg = "Camera service has encountered a fatal error, please try again.";
+                    errorMsg = "Cameras service has encountered a fatal error, please try again.";
                     break;
             }
             throwError(new Exception(errorMsg));
@@ -187,27 +191,27 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
     private int mState = STATE_PREVIEW;
 
     /**
-     * Camera state: Showing camera preview.
+     * Cameras state: Showing camera preview.
      */
     private static final int STATE_PREVIEW = 0;
 
     /**
-     * Camera state: Waiting for the focus to be locked.
+     * Cameras state: Waiting for the focus to be locked.
      */
     private static final int STATE_WAITING_LOCK = 1;
 
     /**
-     * Camera state: Waiting for the exposure to be precapture state.
+     * Cameras state: Waiting for the exposure to be precapture state.
      */
     private static final int STATE_WAITING_PRECAPTURE = 2;
 
     /**
-     * Camera state: Waiting for the exposure state to be something other than precapture.
+     * Cameras state: Waiting for the exposure state to be something other than precapture.
      */
     private static final int STATE_WAITING_NON_PRECAPTURE = 3;
 
     /**
-     * Camera state: Picture was taken.
+     * Cameras state: Picture was taken.
      */
     private static final int STATE_PICTURE_TAKEN = 4;
 
@@ -727,7 +731,7 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    throwError(new Exception("Camera configuration failed"));
+                    throwError(new Exception("Cameras configuration failed"));
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {

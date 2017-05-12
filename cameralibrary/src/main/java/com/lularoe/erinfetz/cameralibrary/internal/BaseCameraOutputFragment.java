@@ -30,19 +30,20 @@ import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
 
 import java.io.File;
 
 import static android.app.Activity.RESULT_CANCELED;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_OFF;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
 
 /**
  *
  */
-abstract class BaseCameraFragment extends Fragment implements CameraUriInterface, View.OnClickListener {
+abstract class BaseCameraOutputFragment extends Fragment implements CameraOutputUriProvider, View.OnClickListener {
 
     protected ImageButton mButtonVideo;
     protected ImageButton mButtonStillshot;

@@ -1,26 +1,15 @@
 package com.lularoe.erinfetz.cameralibrary.util;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity;
+import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -30,33 +19,24 @@ public class CameraUtil {
     private CameraUtil() {
     }
 
-    public static boolean isChromium() {
-        return Build.BRAND.equalsIgnoreCase("chromium") &&
-                Build.MANUFACTURER.equalsIgnoreCase("chromium");
-    }
 
-    public static String getDurationString(long durationMs) {
-        return String.format(Locale.getDefault(), "%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(durationMs),
-                TimeUnit.MILLISECONDS.toSeconds(durationMs) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMs))
-        );
-    }
 
-    @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
-    public static File makeTempFile(@NonNull Context context, @Nullable String saveDir, String prefix, String extension) {
-        if (saveDir == null)
-            saveDir = context.getExternalCacheDir().getAbsolutePath();
-        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        final File dir = new File(saveDir);
-        dir.mkdirs();
-        return new File(dir, prefix + timeStamp + extension);
-    }
 
-    public static boolean hasCamera(Context context) {
-        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
-                context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
-    }
+//
+//    @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
+//    public static File makeTempFile(@NonNull Context context, @Nullable String saveDir, String prefix, String extension) {
+//        if (saveDir == null)
+//            saveDir = context.getExternalCacheDir().getAbsolutePath();
+//        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+//        final File dir = new File(saveDir);
+//        dir.mkdirs();
+//        return new File(dir, prefix + timeStamp + extension);
+//    }
+//
+//    public static boolean hasCamera(Context context) {
+//        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
+//                context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
+//    }
 
     public static List<Integer> getSupportedFlashModes(Context context, Camera.Parameters parameters) {
         //check has system feature for flash
@@ -129,58 +109,37 @@ public class CameraUtil {
         return null; //not supported
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static boolean hasCamera2(Context context, boolean stillShot) {
-        if (context == null) return false;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return false;
-        if (stillShot && ManufacturerUtil.isSamsungDevice()) return false;
-        try {
-            CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-            String[] idList = manager.getCameraIdList();
-            boolean notNull = true;
-            if (idList.length == 0) {
-                notNull = false;
-            } else {
-                for (final String str : idList) {
-                    if (str == null || str.trim().isEmpty()) {
-                        notNull = false;
-                        break;
-                    }
-                    final CameraCharacteristics characteristics = manager.getCameraCharacteristics(str);
-                    //noinspection ConstantConditions
-                    final int supportLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-                    if (supportLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                        notNull = false;
-                        break;
-                    }
-                }
-            }
-            return notNull;
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return false;
-        }
-    }
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    public static boolean hasCamera2(Context context, boolean stillShot) {
+//        if (context == null) return false;
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return false;
+//        if (stillShot && ManufacturerUtil.isSamsungDevice()) return false;
+//        try {
+//            CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+//            String[] idList = manager.getCameraIdList();
+//            boolean notNull = true;
+//            if (idList.length == 0) {
+//                notNull = false;
+//            } else {
+//                for (final String str : idList) {
+//                    if (str == null || str.trim().isEmpty()) {
+//                        notNull = false;
+//                        break;
+//                    }
+//                    final CameraCharacteristics characteristics = manager.getCameraCharacteristics(str);
+//                    //noinspection ConstantConditions
+//                    final int supportLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+//                    if (supportLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
+//                        notNull = false;
+//                        break;
+//                    }
+//                }
+//            }
+//            return notNull;
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//            return false;
+//        }
+//    }
 
-    @ColorInt
-    public static int darkenColor(@ColorInt int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f; // value component
-        color = Color.HSVToColor(hsv);
-        return color;
-    }
-
-    public static boolean isColorDark(int color) {
-        double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
-        return darkness >= 0.5;
-    }
-
-    public static int adjustAlpha(int color, @SuppressWarnings("SameParameterValue") float factor) {
-        int alpha = Math.round(Color.alpha(color) * factor);
-        int red = Color.red(color);
-        int green = Color.green(color);
-        int blue = Color.blue(color);
-        return Color.argb(alpha, red, green, blue);
-    }
 }

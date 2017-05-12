@@ -23,12 +23,25 @@ public class ImageSaver {
         void onImageSaveError(File imagePath, Exception e);
     }
 
-
-    private final File file;
+    private File file;
     private ImageSaverCallback imageSaverCallback;
 
     private ImageSaver(@NonNull File file){
         this.file= file;
+    }
+    private ImageSaver(){}
+
+    public static ImageSaver create(){
+        return new ImageSaver();
+    }
+
+    public static ImageSaver create(@NonNull File file){
+        return new ImageSaver(file);
+    }
+
+    public ImageSaver file(@NonNull File c){
+        this.file = c;
+        return this;
     }
 
     public ImageSaver callback(@NonNull ImageSaverCallback c){

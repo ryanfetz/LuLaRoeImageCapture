@@ -12,7 +12,7 @@ import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-public abstract class BaseGalleryFragment extends Fragment implements CameraUriInterface, View.OnClickListener {
+public abstract class BaseGalleryFragment extends Fragment implements CameraOutputUriProvider, View.OnClickListener {
 
     BaseCaptureInterface mInterface;
     int mPrimaryColor;

@@ -11,7 +11,6 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
 import com.lularoe.erinfetz.cameralibrary.R;
-import com.lularoe.erinfetz.cameralibrary.util.ImageUtil;
 
 public class StillshotPreviewFragment extends BaseGalleryFragment {
 

@@ -1,10 +1,9 @@
-package com.lularoe.erinfetz.cameralibrary;
+package com.lularoe.erinfetz.cameralibrary.material;
 
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 
-import com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity;
-import com.lularoe.erinfetz.cameralibrary.internal.Camera2Fragment;
+import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
 
 public class CaptureActivity2 extends BaseCaptureActivity {
 

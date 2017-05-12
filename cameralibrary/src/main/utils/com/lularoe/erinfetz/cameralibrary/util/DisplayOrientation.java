@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.core.utils;
+package com.lularoe.erinfetz.cameralibrary.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +19,7 @@ public class DisplayOrientation {
     private DisplayOrientation(){
 
     }
+
     @DegreeUnits
     public static int getDisplayRotation(@NonNull Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);

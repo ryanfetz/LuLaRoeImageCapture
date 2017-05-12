@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.base.material;
 
 import android.Manifest;
 import android.app.Activity;
@@ -26,6 +26,14 @@ import android.view.WindowManager;
 import com.lularoe.erinfetz.cameralibrary.CameraActivityManager;
 import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.TimeLimitReachedException;
+import com.lularoe.erinfetz.cameralibrary.base.CameraConfiguration;
+import com.lularoe.erinfetz.cameralibrary.internal.BaseCameraFragment;
+import com.lularoe.erinfetz.cameralibrary.internal.BaseGalleryFragment;
+import com.lularoe.erinfetz.cameralibrary.internal.CameraIntentKey;
+import com.lularoe.erinfetz.cameralibrary.internal.CameraOutputUriProvider;
+import com.lularoe.erinfetz.cameralibrary.internal.PlaybackVideoFragment;
+import com.lularoe.erinfetz.cameralibrary.internal.StillshotPreviewFragment;
+import com.lularoe.erinfetz.cameralibrary.types.Cameras;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -35,10 +43,9 @@ import java.util.List;
 /**
  *
  */
-public abstract class BaseCaptureActivity extends AppCompatActivity implements BaseCaptureInterface {
+public abstract class BaseCaptureActivity extends AppCompatActivity implements MaterialMediaCaptureContext {
 
-    private int mCameraPosition = com.lularoe.erinfetz.cameralibrary.types.Camera.CAMERA_POSITION_UNKNOWN;
-    private int mFlashMode = com.lularoe.erinfetz.cameralibrary.types.Camera.FLASH_MODE_OFF;
+
     private boolean mRequestingPermission;
     private long mRecordingStart = -1;
     private long mRecordingEnd = -1;
@@ -50,7 +57,12 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
 
     public static final int PERMISSION_RC = 69;
 
+    private MaterialCameraStyleConfiguration styleConfig;
+    private CameraConfiguration config;
 
+    @Cameras.CameraPosition
+    protected int mCameraPosition = Cameras.CAMERA_POSITION_UNKNOWN;
+    protected int mFlashMode = Cameras.FLASH_MODE_OFF;
 
     @Override
     protected final void onSaveInstanceState(Bundle outState) {
@@ -77,7 +89,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
 
-        if (!CameraUtil.hasCamera(this)) {
+        if (!Cameras.hasCamera(this)) {
             new MaterialDialog.Builder(this)
                     .title(R.string.mcam_error)
                     .content(R.string.mcam_video_capture_unsupported)
@@ -110,7 +122,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
             checkPermissions();
             mLengthLimit = getIntent().getLongExtra(CameraIntentKey.LENGTH_LIMIT, -1);
         } else {
-            mCameraPosition = savedInstanceState.getInt("camera_position", -1);
+            mCameraPosition = savedInstanceState.getInt("camera_position", Cameras.CAMERA_POSITION_UNKNOWN);
             mRequestingPermission = savedInstanceState.getBoolean("requesting_permission", false);
             mRecordingStart = savedInstanceState.getLong("recording_start", -1);
             mRecordingEnd = savedInstanceState.getLong("recording_end", -1);
@@ -171,12 +183,12 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
         Fragment frag = getFragmentManager().findFragmentById(R.id.container);
         if (frag != null) {
             if (frag instanceof PlaybackVideoFragment && allowRetry()) {
-                onRetry(((CameraUriInterface) frag).getOutputUri());
+                onRetry(((CameraOutputUriProvider) frag).getOutputUri());
                 return;
             } else if (frag instanceof BaseCameraFragment) {
                 ((BaseCameraFragment) frag).cleanup();
             } else if (frag instanceof BaseGalleryFragment && allowRetry()) {
-                onRetry(((CameraUriInterface) frag).getOutputUri());
+                onRetry(((CameraOutputUriProvider) frag).getOutputUri());
                 return;
             }
         }
@@ -237,14 +249,14 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
 
     @Override
     public void toggleCameraPosition() {
-        if (getCurrentCameraPosition() == com.lularoe.erinfetz.cameralibrary.types.Camera.CAMERA_POSITION_FRONT) {
+        if (getCurrentCameraPosition() == Cameras.CAMERA_POSITION_FRONT) {
             // Front, go to back if possible
             if (getBackCamera() != null)
-                setCameraPosition(com.lularoe.erinfetz.cameralibrary.types.Camera.CAMERA_POSITION_BACK);
+                setCameraPosition(Cameras.CAMERA_POSITION_BACK);
         } else {
             // Back, go to front if possible
             if (getFrontCamera() != null)
-                setCameraPosition(com.lularoe.erinfetz.cameralibrary.types.Camera.CAMERA_POSITION_FRONT);
+                setCameraPosition(Cameras.CAMERA_POSITION_FRONT);
         }
     }
 
@@ -255,7 +267,7 @@ public abstract class BaseCaptureActivity extends AppCompatActivity implements B
 
     @Override
     public Object getCurrentCameraId() {
-        if (getCurrentCameraPosition() == com.lularoe.erinfetz.cameralibrary.types.Camera.CAMERA_POSITION_FRONT)
+        if (getCurrentCameraPosition() == Cameras.CAMERA_POSITION_FRONT)
             return getFrontCamera();
         else return getBackCamera();
     }

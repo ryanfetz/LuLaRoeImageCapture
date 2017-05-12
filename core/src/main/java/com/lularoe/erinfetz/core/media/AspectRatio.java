@@ -5,6 +5,8 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.util.SparseArrayCompat;
 
+import com.lularoe.erinfetz.core.graphics.Size;
+
 public class AspectRatio implements Comparable<AspectRatio>, Parcelable {
 
     private final static SparseArrayCompat<SparseArrayCompat<AspectRatio>> sCache = new SparseArrayCompat<>(16);

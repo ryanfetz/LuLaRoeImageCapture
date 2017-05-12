@@ -14,6 +14,7 @@ public class Orientation {
     private Orientation(){
 
     }
+
     @IntDef({ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
             ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE})
     @Retention(RetentionPolicy.SOURCE)
@@ -31,16 +32,6 @@ public class Orientation {
     public @interface SensorPosition {
     }
 
-
-    public static final int DISPLAY_ROTATION_0 = DEGREES_0;
-    public static final int DISPLAY_ROTATION_90 = DEGREES_90;
-    public static final int DISPLAY_ROTATION_180 = DEGREES_180;
-    public static final int DISPLAY_ROTATION_270 = DEGREES_270;
-
-    @IntDef({DISPLAY_ROTATION_0, DISPLAY_ROTATION_90, DISPLAY_ROTATION_180, DISPLAY_ROTATION_270})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DisplayRotation {
-    }
 
     @IntDef({Configuration.ORIENTATION_UNDEFINED, Configuration.ORIENTATION_LANDSCAPE, Configuration.ORIENTATION_PORTRAIT})
     @Retention(RetentionPolicy.SOURCE)

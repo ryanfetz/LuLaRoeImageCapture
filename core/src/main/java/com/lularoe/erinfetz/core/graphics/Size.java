@@ -1,8 +1,10 @@
-package com.lularoe.erinfetz.core.media;
+package com.lularoe.erinfetz.core.graphics;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+
+import java.util.Comparator;
 
 public class Size implements Comparable<Size>, Parcelable {
 
@@ -56,6 +58,24 @@ public class Size implements Comparable<Size>, Parcelable {
         return new Size(w,h);
     }
 
+    public static Size parseSize(@NonNull String string)
+            throws NumberFormatException {
+
+        int sep_ix = string.indexOf('*');
+        if (sep_ix < 0) {
+            sep_ix = string.indexOf('x');
+        }
+        if (sep_ix < 0) {
+            throw new NumberFormatException("Invalid Size: \"" + string + "\"");
+        }
+        try {
+            return new Size(Integer.parseInt(string.substring(0, sep_ix)),
+                    Integer.parseInt(string.substring(sep_ix + 1)));
+        } catch (NumberFormatException e) {
+            throw new NumberFormatException("Invalid Size: \"" + string + "\"");
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -82,4 +102,13 @@ public class Size implements Comparable<Size>, Parcelable {
         }
 
     };
+
+    public static class CompareSizesByArea implements Comparator<Size> {
+        @Override
+        public int compare(Size lhs, Size rhs) {
+            // We cast here to ensure the multiplications won't overflow
+            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+                    (long) rhs.getWidth() * rhs.getHeight());
+        }
+    }
 }

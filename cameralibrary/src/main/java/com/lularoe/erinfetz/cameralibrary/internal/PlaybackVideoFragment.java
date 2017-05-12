@@ -20,7 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 /**
  *
  */
-public class PlaybackVideoFragment extends Fragment implements CameraUriInterface, EasyVideoCallback {
+public class PlaybackVideoFragment extends Fragment implements CameraOutputUriProvider, EasyVideoCallback {
 
     private EasyVideoPlayer mPlayer;
     private String mOutputUri;

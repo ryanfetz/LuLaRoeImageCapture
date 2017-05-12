@@ -20,11 +20,16 @@ public class ManufacturerUtil {
     public static final Integer SAMSUNG_S3_PREVIEW_HEIGHT = 480;
 
     // Samsung Galaxy helper functions
-    static boolean isSamsungDevice() {
+    public static boolean isSamsungDevice() {
         return SAMSUNG_MANUFACTURER.equals(Build.MANUFACTURER.toLowerCase());
     }
 
     public static boolean isSamsungGalaxyS3() {
         return Build.DEVICE.startsWith(SAMSUNG_S3_DEVICE_COMMON_PREFIX);
+    }
+
+    public static boolean isChromium() {
+        return Build.BRAND.equalsIgnoreCase("chromium") &&
+                Build.MANUFACTURER.equalsIgnoreCase("chromium");
     }
 }

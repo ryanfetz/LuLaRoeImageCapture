@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.material;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -19,8 +19,11 @@ import android.widget.Toast;
 
 import com.lularoe.erinfetz.cameralibrary.ICallback;
 import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.internal.BaseCameraFragment;
+import com.lularoe.erinfetz.cameralibrary.internal.CameraIntentKey;
+import com.lularoe.erinfetz.cameralibrary.internal.CameraPreview;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
-import com.lularoe.erinfetz.cameralibrary.util.ImageUtil;
+import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
 import com.lularoe.erinfetz.cameralibrary.util.ManufacturerUtil;
 
 import java.io.File;
@@ -29,12 +32,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_FRONT;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.cameralibrary.internal.BaseCaptureActivity.FLASH_MODE_OFF;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_FRONT;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
+import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
 
 /**
  *

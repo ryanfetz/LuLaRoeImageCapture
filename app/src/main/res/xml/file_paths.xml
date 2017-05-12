@@ -3,4 +3,6 @@
     <external-path name="external_images" path="Android/data/com.lularoe.erinfetz.imagecapture/files/Pictures/" />
     <external-path name="external_pictures" path="Pictures/" />
     <files-path name="internal_images" path="images/" />
+    <external-cache-path name="external_cache" path="Android/data/com.lularoe.erinfetz.imagecapture/cache/" />
+    <cache-path name="internal_cache" path="cache/" />
 </paths>
