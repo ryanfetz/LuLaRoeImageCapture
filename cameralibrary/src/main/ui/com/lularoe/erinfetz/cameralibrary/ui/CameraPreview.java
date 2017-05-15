@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("ViewConstructor")
-class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private final static String TAG = "SF-CameraPreview";
 

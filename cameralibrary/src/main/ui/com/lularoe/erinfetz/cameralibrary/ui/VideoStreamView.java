@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

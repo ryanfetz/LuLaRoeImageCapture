@@ -102,13 +102,4 @@ public class Size implements Comparable<Size>, Parcelable {
         }
 
     };
-
-    public static class CompareSizesByArea implements Comparator<Size> {
-        @Override
-        public int compare(Size lhs, Size rhs) {
-            // We cast here to ensure the multiplications won't overflow
-            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-                    (long) rhs.getWidth() * rhs.getHeight());
-        }
-    }
 }

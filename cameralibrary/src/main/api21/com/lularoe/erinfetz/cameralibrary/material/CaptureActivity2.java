@@ -3,7 +3,7 @@ package com.lularoe.erinfetz.cameralibrary.material;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 
-import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
+import com.lularoe.erinfetz.cameralibrary.base.material.BaseCaptureActivity;
 
 public class CaptureActivity2 extends BaseCaptureActivity {
 

@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.base.CameraOutputUriProvider;
+import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -50,11 +52,11 @@ public class PlaybackVideoFragment extends Fragment implements CameraOutputUriPr
         mInterface = (BaseCaptureInterface) activity;
     }
 
-    public static PlaybackVideoFragment newInstance(String outputUri, boolean allowRetry, int primaryColor) {
+    public static PlaybackVideoFragment newInstance(Uri outputUri, boolean allowRetry, int primaryColor) {
         PlaybackVideoFragment fragment = new PlaybackVideoFragment();
         fragment.setRetainInstance(true);
         Bundle args = new Bundle();
-        args.putString("output_uri", outputUri);
+        args.putParcelable(CameraIntentKey.OUTPUT_URI, outputUri);
         args.putBoolean(CameraIntentKey.ALLOW_RETRY, allowRetry);
         args.putInt(CameraIntentKey.PRIMARY_COLOR, primaryColor);
         fragment.setArguments(args);

@@ -4,6 +4,8 @@ package com.lularoe.erinfetz.cameralibrary.types;
 import java.io.Serializable;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
+import android.support.annotation.StringDef;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -40,5 +42,21 @@ public class Media {
     @IntDef({MEDIA_ACTION_VIDEO, MEDIA_ACTION_PHOTO, MEDIA_ACTION_UNSPECIFIED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MediaAction {
+    }
+
+    public static final String MEDIA_ERROR_EXTRA = "mcam_error";
+    public static final String MEDIA_STATUS_EXTRA = "mcam_status";
+
+    public static final int MEDIA_STATUS_RECORDED = 1;
+    public static final int MEDIA_STATUS_RETRY = 2;
+
+    @IntDef({MEDIA_STATUS_RECORDED, MEDIA_STATUS_RETRY})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MediaActionStatus {
+    }
+
+    @StringDef({MEDIA_ERROR_EXTRA, MEDIA_STATUS_EXTRA})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MediaActionKey {
     }
 }

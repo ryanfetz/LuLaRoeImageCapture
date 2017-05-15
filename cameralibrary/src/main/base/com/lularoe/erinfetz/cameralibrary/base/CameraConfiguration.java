@@ -4,9 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
-import android.widget.Button;
 
-import com.lularoe.erinfetz.cameralibrary.CameraActivityManager;
 import com.lularoe.erinfetz.cameralibrary.types.Cameras;
 import com.lularoe.erinfetz.cameralibrary.types.Media;
 import com.lularoe.erinfetz.core.DateTimeUtils;
@@ -15,8 +13,6 @@ public class CameraConfiguration implements Parcelable {
 
     public static final int UNDEFINIED_INTEGER = -1;
     public static final int UNDEFINIED_LONG = -1;
-
-    public static final String INTENT_KEY = "cameraConfig";
 
     public static final int DEFAULT_VIDEO_PREF_HEIGHT = 720;
     public static final float DEFAULT_VIDEO_PREF_ASPECT = 4f / 3f;
@@ -49,6 +45,14 @@ public class CameraConfiguration implements Parcelable {
     private boolean audioDisabled = false;
     private boolean forceCamera1 = false;
 
+    public boolean hasVideoDuration(){
+        return getVideoDuration() > -1;
+    }
+
+    public boolean hasMinimumVideoDuration(){
+        return getMinimumVideoDuration() > -1;
+    }
+
     public long getVideoDuration() {
         return videoDuration;
     }
@@ -78,24 +82,24 @@ public class CameraConfiguration implements Parcelable {
     }
 
     public int videoEncodingBitRate(int defaultVal){
-        if(videoEncodingBitRate== UNDEFINIED_INTEGER){
+        if(getVideoEncodingBitRate()== UNDEFINIED_INTEGER){
             return defaultVal;
         }
-        return videoEncodingBitRate;
+        return getVideoEncodingBitRate();
     }
 
     public int audioEncodingBitRate(int defaultVal){
-        if(audioEncodingBitRate== UNDEFINIED_INTEGER){
+        if(getAudioEncodingBitRate()== UNDEFINIED_INTEGER){
             return defaultVal;
         }
-        return audioEncodingBitRate;
+        return getAudioEncodingBitRate();
     }
 
     public int videoFrameRate(int defaultVal){
-        if(videoFrameRate== UNDEFINIED_INTEGER){
+        if(getVideoFrameRate()== UNDEFINIED_INTEGER){
             return defaultVal;
         }
-        return videoFrameRate;
+        return getVideoFrameRate();
     }
 
     public long getMaxFileSize() {

@@ -43,10 +43,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.lularoe.erinfetz.cameralibrary.R;
-import com.lularoe.erinfetz.cameralibrary.internal.AutoFitTextureView;
-import com.lularoe.erinfetz.cameralibrary.internal.BaseCameraFragment;
-import com.lularoe.erinfetz.cameralibrary.internal.CameraIntentKey;
-import com.lularoe.erinfetz.cameralibrary.internal.VideoStreamView;
+import com.lularoe.erinfetz.cameralibrary.base.material.MaterialMediaCaptureContext;
+import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
+import com.lularoe.erinfetz.cameralibrary.ui.AutoFitTextureView;
+import com.lularoe.erinfetz.cameralibrary.ui.VideoStreamView;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -63,12 +63,11 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_FRONT;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
+import com.lularoe.erinfetz.cameralibrary.base.material.BaseCameraFragment;
+import com.lularoe.erinfetz.cameralibrary.util.DisplayOrientation;
+import com.lularoe.erinfetz.core.media.Degrees;
+
+import static com.lularoe.erinfetz.cameralibrary.types.Cameras.*;
 
 /**
  *
@@ -300,13 +299,13 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
         return fragment;
     }
 
-    private static Size chooseVideoSize(BaseCaptureInterface ci, Size[] choices) {
+    private static Size chooseVideoSize(MaterialMediaCaptureContext ci, Size[] choices) {
         Size backupSize = null;
         for (Size size : choices) {
-            if (size.getHeight() <= ci.videoPreferredHeight()) {
-                if (size.getWidth() == size.getHeight() * ci.videoPreferredAspect())
+            if (size.getHeight() <= ci.getCameraConfiguration().getVideoPreferredHeight()) {
+                if (size.getWidth() == size.getHeight() * ci.getCameraConfiguration().getVideoPreferredAspect())
                     return size;
-                if (ci.videoPreferredHeight() >= size.getHeight())
+                if (ci.getCameraConfiguration().getVideoPreferredHeight() >= size.getHeight())
                     backupSize = size;
             }
         }
@@ -472,20 +471,20 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
 
             switch (mInterface.getCurrentCameraPosition()) {
                 case CAMERA_POSITION_FRONT:
-                    setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                    setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                     break;
                 case CAMERA_POSITION_BACK:
-                    setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                    setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                     break;
                 case CAMERA_POSITION_UNKNOWN:
                 default:
                     if (getArguments().getBoolean(CameraIntentKey.DEFAULT_TO_FRONT_FACING, false)) {
                         // Check front facing first
                         if (mInterface.getFrontCamera() != null) {
-                            setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                             mInterface.setCameraPosition(CAMERA_POSITION_FRONT);
                         } else {
-                            setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                             if (mInterface.getBackCamera() != null)
                                 mInterface.setCameraPosition(CAMERA_POSITION_BACK);
                             else mInterface.setCameraPosition(CAMERA_POSITION_UNKNOWN);
@@ -493,10 +492,10 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
                     } else {
                         // Check back facing first
                         if (mInterface.getBackCamera() != null) {
-                            setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                             mInterface.setCameraPosition(CAMERA_POSITION_BACK);
                         } else {
-                            setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                             if (mInterface.getFrontCamera() != null)
                                 mInterface.setCameraPosition(CAMERA_POSITION_FRONT);
                             else mInterface.setCameraPosition(CAMERA_POSITION_UNKNOWN);
@@ -520,8 +519,8 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
             final int sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
             @Degrees.DegreeUnits
-            int deviceRotation = Degrees.getDisplayRotation(getActivity());
-            mDisplayOrientation = Degrees.getDisplayOrientation(
+            int deviceRotation = DisplayOrientation.getDisplayRotation(getActivity());
+            mDisplayOrientation = DisplayOrientation.getDisplayOrientation(
                     sensorOrientation, deviceRotation, getCurrentCameraPosition() == CAMERA_POSITION_FRONT);
             Log.d("Camera2Fragment", String.format("Orientations: Sensor = %d˚, Device = %d˚, Display = %d˚",
                     sensorOrientation, deviceRotation, mDisplayOrientation));
@@ -795,7 +794,7 @@ public class Camera2Fragment extends BaseCameraFragment implements View.OnClickL
     private boolean setUpMediaRecorder() {
         final Activity activity = getActivity();
         if (null == activity) return false;
-        final BaseCaptureInterface captureInterface = (BaseCaptureInterface) activity;
+        final MaterialMediaCaptureContext captureInterface = (MaterialMediaCaptureContext) activity;
         if (mMediaRecorder == null)
             mMediaRecorder = new MediaRecorder();
 

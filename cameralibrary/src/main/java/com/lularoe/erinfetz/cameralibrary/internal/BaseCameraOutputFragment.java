@@ -25,8 +25,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lularoe.erinfetz.cameralibrary.CameraActivityManager;
+import com.lularoe.erinfetz.cameralibrary.base.material.MaterialCameraActivityManager;
 import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.base.CameraOutputUriProvider;
+import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -374,7 +376,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     protected final void throwError(Exception e) {
         Activity act = getActivity();
         if (act != null) {
-            act.setResult(RESULT_CANCELED, new Intent().putExtra(CameraActivityManager.ERROR_EXTRA, e));
+            act.setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCameraActivityManager.ERROR_EXTRA, e));
             act.finish();
         }
     }

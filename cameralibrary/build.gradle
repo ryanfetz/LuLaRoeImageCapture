@@ -31,6 +31,7 @@ android {
         main.java.srcDirs += 'src/main/api21'
         main.java.srcDirs += 'src/main/types'
         main.java.srcDirs += 'src/main/utils'
+        main.java.srcDirs += 'src/main/ui'
     }
 }
 

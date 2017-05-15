@@ -11,6 +11,7 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
 import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
 
 public class StillshotPreviewFragment extends BaseGalleryFragment {
 
@@ -21,11 +22,11 @@ public class StillshotPreviewFragment extends BaseGalleryFragment {
      */
     private static Bitmap mBitmap;
 
-    public static StillshotPreviewFragment newInstance(String outputUri, boolean allowRetry, int primaryColor) {
+    public static StillshotPreviewFragment newInstance(Uri outputUri, boolean allowRetry, int primaryColor) {
         final StillshotPreviewFragment fragment = new StillshotPreviewFragment();
         fragment.setRetainInstance(true);
         Bundle args = new Bundle();
-        args.putString("output_uri", outputUri);
+        args.putParcelable(CameraIntentKey.OUTPUT_URI, outputUri);
         args.putBoolean(CameraIntentKey.ALLOW_RETRY, allowRetry);
         args.putInt(CameraIntentKey.PRIMARY_COLOR, primaryColor);
         fragment.setArguments(args);

@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.core.base;
+package com.lularoe.erinfetz.cameralibrary.base;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -13,8 +13,6 @@ import com.lularoe.erinfetz.core.media.Degrees;
 import com.lularoe.erinfetz.cameralibrary.util.DisplayOrientation;
 
 public class CameraOrientation implements Parcelable {
-
-    public static final String INTENT_KEY = "cameraOrientation";
 
     @Orientation.SensorPosition
     protected int sensorPosition = Orientation.SENSOR_POSITION_UNSPECIFIED;

@@ -19,11 +19,13 @@ import android.widget.Toast;
 
 import com.lularoe.erinfetz.cameralibrary.ICallback;
 import com.lularoe.erinfetz.cameralibrary.R;
-import com.lularoe.erinfetz.cameralibrary.internal.BaseCameraFragment;
-import com.lularoe.erinfetz.cameralibrary.internal.CameraIntentKey;
-import com.lularoe.erinfetz.cameralibrary.internal.CameraPreview;
+import com.lularoe.erinfetz.cameralibrary.base.CameraProfileProvider;
+import com.lularoe.erinfetz.cameralibrary.base.material.BaseCaptureActivity;
+import com.lularoe.erinfetz.cameralibrary.base.material.MaterialMediaCaptureContext;
+import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
+import com.lularoe.erinfetz.cameralibrary.ui.CameraPreview;
 import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
-import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
+import com.lularoe.erinfetz.cameralibrary.util.DisplayOrientation;
 import com.lularoe.erinfetz.cameralibrary.util.ManufacturerUtil;
 
 import java.io.File;
@@ -32,12 +34,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_FRONT;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
+
+import static com.lularoe.erinfetz.cameralibrary.types.Media.*;
+import static com.lularoe.erinfetz.cameralibrary.types.Cameras.*;
+
+import com.lularoe.erinfetz.cameralibrary.base.material.BaseCameraFragment;
+import com.lularoe.erinfetz.core.media.Degrees;
 
 /**
  *
@@ -62,13 +64,13 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
         return fragment;
     }
 
-    private static Camera.Size chooseVideoSize(BaseCaptureInterface ci, List<Camera.Size> choices) {
+    private static Camera.Size chooseVideoSize(MaterialMediaCaptureContext ci, List<Camera.Size> choices) {
         Camera.Size backupSize = null;
         for (Camera.Size size : choices) {
-            if (size.height <= ci.videoPreferredHeight()) {
-                if (size.width == size.height * ci.videoPreferredAspect())
+            if (size.height <= ci.getCameraConfiguration().getVideoPreferredHeight()) {
+                if (size.width == size.height * ci.getCameraConfiguration().getVideoPreferredAspect())
                     return size;
-                if (ci.videoPreferredHeight() >= size.height)
+                if (ci.getCameraConfiguration().getVideoPreferredHeight() >= size.height)
                     backupSize = size;
             }
         }
@@ -179,20 +181,20 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
 
             switch (getCurrentCameraPosition()) {
                 case CAMERA_POSITION_FRONT:
-                    setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                    setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                     break;
                 case CAMERA_POSITION_BACK:
-                    setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                    setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                     break;
                 case CAMERA_POSITION_UNKNOWN:
                 default:
-                    if (getArguments().getBoolean(CameraIntentKey.DEFAULT_TO_FRONT_FACING, false)) {
+                    if (mInterface.getCameraStyleConfiguration().isDefaultToFrontFacing()) {
                         // Check front facing first
                         if (mInterface.getFrontCamera() != null && (Integer) mInterface.getFrontCamera() != -1) {
-                            setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                             mInterface.setCameraPosition(CAMERA_POSITION_FRONT);
                         } else {
-                            setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                             if (mInterface.getBackCamera() != null && (Integer) mInterface.getBackCamera() != -1)
                                 mInterface.setCameraPosition(CAMERA_POSITION_BACK);
                             else mInterface.setCameraPosition(CAMERA_POSITION_UNKNOWN);
@@ -200,10 +202,10 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
                     } else {
                         // Check back facing first
                         if (mInterface.getBackCamera() != null && (Integer) mInterface.getBackCamera() != -1) {
-                            setImageRes(mButtonFacing, mInterface.iconFrontCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconFrontCamera());
                             mInterface.setCameraPosition(CAMERA_POSITION_BACK);
                         } else {
-                            setImageRes(mButtonFacing, mInterface.iconRearCamera());
+                            setImageRes(mButtonFacing, mInterface.getCameraStyleConfiguration().getIconRearCamera());
                             if (mInterface.getFrontCamera() != null && (Integer) mInterface.getFrontCamera() != -1)
                                 mInterface.setCameraPosition(CAMERA_POSITION_FRONT);
                             else mInterface.setCameraPosition(CAMERA_POSITION_UNKNOWN);
@@ -277,21 +279,21 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
         Camera.CameraInfo info =
                 new Camera.CameraInfo();
         Camera.getCameraInfo(getCurrentCameraId(), info);
-        final int deviceOrientation = Degrees.getDisplayRotation(getActivity());
-        mDisplayOrientation = Degrees.getDisplayOrientation(
+        final int deviceOrientation = DisplayOrientation.getDisplayRotation(getActivity());
+        mDisplayOrientation = DisplayOrientation.getDisplayOrientation(
                 info.orientation, deviceOrientation, info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT);
         Log.d("CameraFragment", String.format("Orientations: Sensor = %d˚, Device = %d˚, Display = %d˚",
                 info.orientation, deviceOrientation, mDisplayOrientation));
 
         int previewOrientation;
         int jpegOrientation;
-        if (CameraUtil.isChromium()) {
+        if (ManufacturerUtil.isChromium()) {
             previewOrientation = 0;
             jpegOrientation = 0;
         } else {
             jpegOrientation = previewOrientation = mDisplayOrientation;
 
-            if (Degrees.isPortrait(deviceOrientation) && getCurrentCameraPosition() == CAMERA_POSITION_FRONT)
+            if (DisplayOrientation.isPortrait(deviceOrientation) && getCurrentCameraPosition() == CAMERA_POSITION_FRONT)
                 previewOrientation = Degrees.mirror(mDisplayOrientation);
         }
 
@@ -332,7 +334,7 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
         try {
             final Activity activity = getActivity();
             if (null == activity) return false;
-            final BaseCaptureInterface captureInterface = (BaseCaptureInterface) activity;
+            final MaterialMediaCaptureContext captureInterface = (MaterialMediaCaptureContext) activity;
 
             setCameraDisplayOrientation(mCamera.getParameters());
             mMediaRecorder = new MediaRecorder();
@@ -341,7 +343,7 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
             mMediaRecorder.setCamera(mCamera);
 
             boolean canUseAudio = true;
-            boolean audioEnabled = !mInterface.audioDisabled();
+            boolean audioEnabled = !mInterface.getCameraConfiguration().isAudioDisabled();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 canUseAudio = ContextCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
 
@@ -352,23 +354,23 @@ public class CameraFragment extends BaseCameraFragment implements View.OnClickLi
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
-            final CamcorderProfile profile = CamcorderProfile.get(getCurrentCameraId(), mInterface.qualityProfile());
+            final CamcorderProfile profile = CameraProfileProvider.getCamcorderProfile(mInterface.getCameraConfiguration().getMediaQuality(), getCurrentCameraId());
             mMediaRecorder.setOutputFormat(profile.fileFormat);
-            mMediaRecorder.setVideoFrameRate(mInterface.videoFrameRate(profile.videoFrameRate));
+            mMediaRecorder.setVideoFrameRate(mInterface.getCameraConfiguration().videoFrameRate(profile.videoFrameRate));
             mMediaRecorder.setVideoSize(mVideoSize.width, mVideoSize.height);
-            mMediaRecorder.setVideoEncodingBitRate(mInterface.videoEncodingBitRate(profile.videoBitRate));
+            mMediaRecorder.setVideoEncodingBitRate(mInterface.getCameraConfiguration().videoEncodingBitRate(profile.videoBitRate));
             mMediaRecorder.setVideoEncoder(profile.videoCodec);
 
             if (canUseAudio && audioEnabled) {
-                mMediaRecorder.setAudioEncodingBitRate(mInterface.audioEncodingBitRate(profile.audioBitRate));
+                mMediaRecorder.setAudioEncodingBitRate(mInterface.getCameraConfiguration().audioEncodingBitRate(profile.audioBitRate));
                 mMediaRecorder.setAudioChannels(profile.audioChannels);
                 mMediaRecorder.setAudioSamplingRate(profile.audioSampleRate);
                 mMediaRecorder.setAudioEncoder(profile.audioCodec);
             }
 
-            Uri uri = Uri.fromFile(getOutputMediaFile());
-            mOutputUri = uri.toString();
-            mMediaRecorder.setOutputFile(uri.getPath());
+            mOutputUri = getOutputMediaFile();
+            //mOutputUri = uri.toString();
+            mMediaRecorder.setOutputFile(mOutputUri.getPath());
 
             if (captureInterface.maxAllowedFileSize() > 0) {
                 mMediaRecorder.setMaxFileSize(captureInterface.maxAllowedFileSize());
