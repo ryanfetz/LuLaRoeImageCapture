@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary;
+package com.lularoe.erinfetz.cameralibrary.base;
 
 /**
  *

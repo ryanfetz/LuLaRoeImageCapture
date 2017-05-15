@@ -3,34 +3,31 @@ package com.lularoe.erinfetz.cameralibrary.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Size;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.lularoe.erinfetz.cameralibrary.R;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.lularoe.erinfetz.cameralibrary.R;
+import com.lularoe.erinfetz.cameralibrary.util.DisplayOrientation;
+import com.lularoe.erinfetz.cameralibrary.util.SizeUtil;
+import com.lularoe.erinfetz.core.graphics.Size;
 
 /**
  *
  */
 public class VideoStreamView extends SurfaceView implements SurfaceHolder.Callback,
         MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
+
+    public static final String TAG = VideoStreamView.class.getSimpleName();
 
     @Override
     public void onPrepared(MediaPlayer mp) {
@@ -147,8 +144,8 @@ public class VideoStreamView extends SurfaceView implements SurfaceHolder.Callba
             mPlayer.setDataSource(context, uri);
             mPlayer.prepareAsync();
         } catch (Throwable e) {
-            Log.d("VideoStreamView", "Failed to setDataSource/prepareAsync: " + e.getMessage());
-            e.printStackTrace();
+            Log.d(TAG, "Failed to setDataSource/prepareAsync: " + e.getMessage());
+            Log.e(TAG, e.getMessage(),e);
             new MaterialDialog.Builder(mContext)
                     .title(R.string.mcam_error)
                     .content(e.getMessage())
@@ -168,7 +165,7 @@ public class VideoStreamView extends SurfaceView implements SurfaceHolder.Callba
             mPlayer.setDisplay(getHolder());
             mPlayer.start();
         } catch (IllegalArgumentException | IllegalStateException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(),e);
         }
         return true;
     }
@@ -239,118 +236,6 @@ public class VideoStreamView extends SurfaceView implements SurfaceHolder.Callba
             mPlayer.release();
     }
 
-//    public enum Orientation {
-//        Portrait(Configuration.ORIENTATION_PORTRAIT),
-//        Landscape(Configuration.ORIENTATION_LANDSCAPE);
-//
-//        int mValue;
-//
-//        Orientation(int value) {
-//            mValue = value;
-//        }
-//
-//        public static Orientation from(int value) {
-//            switch (value) {
-//                default:
-//                    return Portrait;
-//                case Configuration.ORIENTATION_LANDSCAPE:
-//                    return Landscape;
-//            }
-//        }
-//    }
-
-    @IntDef({ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
-            ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ActivityOrientation {
-    }
-
-    @ActivityOrientation
-    public static int getScreenOrientation(Activity context) {
-        int rotation = context.getWindowManager().getDefaultDisplay().getRotation();
-        DisplayMetrics dm = new DisplayMetrics();
-        context.getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-        int orientation;
-        // if the device's natural orientation is portrait:
-        if ((rotation == Surface.ROTATION_0
-                || rotation == Surface.ROTATION_180) && height > width ||
-                (rotation == Surface.ROTATION_90
-                        || rotation == Surface.ROTATION_270) && width > height) {
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                    break;
-                case Surface.ROTATION_90:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                    break;
-                case Surface.ROTATION_180:
-                    orientation =
-                            ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-                    break;
-                case Surface.ROTATION_270:
-                    orientation =
-                            ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                    break;
-                default:
-                    Log.e("VideoStreamView", "Unknown screen orientation. Defaulting to portrait.");
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                    break;
-            }
-        }
-        // if the device's natural orientation is landscape or if the device
-        // is square:
-        else {
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                    break;
-                case Surface.ROTATION_90:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                    break;
-                case Surface.ROTATION_180:
-                    orientation =
-                            ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                    break;
-                case Surface.ROTATION_270:
-                    orientation =
-                            ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-                    break;
-                default:
-                    Log.e("VideoStreamView", "Unknown screen orientation. Defaulting to landscape.");
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                    break;
-            }
-        }
-
-        return orientation;
-    }
-
-    @Size(value = 2)
-    private int[] getDimensions(int orientation, float videoWidth, float videoHeight) {
-        final float aspectRatio = videoWidth / videoHeight;
-        int width;
-        int height;
-        if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
-                orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
-            width = getMeasuredWidth();
-            height = (int) ((float) width / aspectRatio);
-            if (height > getMeasuredHeight()) {
-                height = getMeasuredHeight();
-                width = (int) ((float) height * aspectRatio);
-            }
-        } else {
-            height = getMeasuredHeight();
-            width = (int) ((float) height * aspectRatio);
-            if (width > getMeasuredWidth()) {
-                width = getMeasuredWidth();
-                height = (int) ((float) width / aspectRatio);
-            }
-        }
-        return new int[]{width, height};
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -362,11 +247,11 @@ public class VideoStreamView extends SurfaceView implements SurfaceHolder.Callba
                     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                     return;
                 }
-                int[] dimensions = getDimensions(getScreenOrientation(mContext), videoWidth, videoHeight);
-                setMeasuredDimension(dimensions[0], dimensions[1]);
+                Size dimensions = SizeUtil.getDimensions(DisplayOrientation.getScreenOrientation(mContext), videoWidth, videoHeight, this);
+                setMeasuredDimension(dimensions.getWidth(), dimensions.getHeight());
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(),e);
         }
     }
 }

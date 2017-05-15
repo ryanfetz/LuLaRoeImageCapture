@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.ui.material;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -15,9 +15,11 @@ import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.base.CameraOutputUriProvider;
+import com.lularoe.erinfetz.cameralibrary.base.material.MaterialMediaCaptureContext;
 import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
-import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.lularoe.erinfetz.core.DateTimeUtils;
+import com.lularoe.erinfetz.core.storage.files.MediaType;
 
 /**
  *
@@ -25,8 +27,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 public class PlaybackVideoFragment extends Fragment implements CameraOutputUriProvider, EasyVideoCallback {
 
     private EasyVideoPlayer mPlayer;
-    private String mOutputUri;
-    private BaseCaptureInterface mInterface;
+    private Uri mOutputUri;
+    private MaterialMediaCaptureContext mInterface;
 
     private Handler mCountdownHandler;
     private final Runnable mCountdownRunnable = new Runnable() {
@@ -38,7 +40,7 @@ public class PlaybackVideoFragment extends Fragment implements CameraOutputUriPr
                     useVideo();
                     return;
                 }
-                mPlayer.setBottomLabelText(String.format("-%s", CameraUtil.getDurationString(diff)));
+                mPlayer.setBottomLabelText(String.format("-%s", DateTimeUtils.getDurationString(diff)));
                 if (mCountdownHandler != null)
                     mCountdownHandler.postDelayed(mCountdownRunnable, 200);
             }
@@ -49,7 +51,7 @@ public class PlaybackVideoFragment extends Fragment implements CameraOutputUriPr
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mInterface = (BaseCaptureInterface) activity;
+        mInterface = (MaterialMediaCaptureContext) activity;
     }
 
     public static PlaybackVideoFragment newInstance(Uri outputUri, boolean allowRetry, int primaryColor) {
@@ -93,25 +95,25 @@ public class PlaybackVideoFragment extends Fragment implements CameraOutputUriPr
         mPlayer = (EasyVideoPlayer) view.findViewById(R.id.playbackView);
         mPlayer.setCallback(this);
 
-        mPlayer.setSubmitTextRes(mInterface.labelConfirm());
-        mPlayer.setRetryTextRes(mInterface.labelRetry());
-        mPlayer.setPlayDrawableRes(mInterface.iconPlay());
-        mPlayer.setPauseDrawableRes(mInterface.iconPause());
+        mPlayer.setSubmitTextRes(mInterface.getCameraStyleConfiguration().getLabelConfirmVideo());
+        mPlayer.setRetryTextRes(mInterface.getCameraStyleConfiguration().getLabelRetry());
+        mPlayer.setPlayDrawableRes(mInterface.getCameraStyleConfiguration().getIconPlay());
+        mPlayer.setPauseDrawableRes(mInterface.getCameraStyleConfiguration().getIconPause());
 
         if (getArguments().getBoolean(CameraIntentKey.ALLOW_RETRY, true))
             mPlayer.setLeftAction(EasyVideoPlayer.LEFT_ACTION_RETRY);
         mPlayer.setRightAction(EasyVideoPlayer.RIGHT_ACTION_SUBMIT);
 
         mPlayer.setThemeColor(getArguments().getInt(CameraIntentKey.PRIMARY_COLOR));
-        mOutputUri = getArguments().getString("output_uri");
+        mOutputUri = getArguments().getParcelable(CameraIntentKey.OUTPUT_URI);
 
-        if (mInterface.hasLengthLimit() && mInterface.shouldAutoSubmit() && mInterface.continueTimerInPlayback()) {
+        if (mInterface.getCameraConfiguration().hasVideoDuration() && mInterface.getCameraStyleConfiguration().isAutoSubmit() && mInterface.getCameraStyleConfiguration().isContinueTimerInPlayback()) {
             final long diff = mInterface.getRecordingEnd() - System.currentTimeMillis();
-            mPlayer.setBottomLabelText(String.format("-%s", CameraUtil.getDurationString(diff)));
+            mPlayer.setBottomLabelText(String.format("-%s", DateTimeUtils.getDurationString(diff)));
             startCountdownTimer();
         }
 
-        mPlayer.setSource(Uri.parse(mOutputUri));
+        mPlayer.setSource(mOutputUri);
     }
 
     private void startCountdownTimer() {
@@ -140,12 +142,12 @@ public class PlaybackVideoFragment extends Fragment implements CameraOutputUriPr
             mPlayer = null;
         }
         if (mInterface != null)
-            mInterface.useMedia(mOutputUri);
+            mInterface.useMedia(mOutputUri, MediaType.VIDEO_MP4);
     }
 
     @Override
-    public String getOutputUri() {
-        return getArguments().getString("output_uri");
+    public Uri getOutputUri() {
+        return getArguments().getParcelable(CameraIntentKey.OUTPUT_URI);
     }
 
     @Override

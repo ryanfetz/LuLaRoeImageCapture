@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.ui.material;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,6 +9,7 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,23 +29,25 @@ import android.widget.TextView;
 import com.lularoe.erinfetz.cameralibrary.base.material.MaterialCameraActivityManager;
 import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.base.CameraOutputUriProvider;
+import com.lularoe.erinfetz.cameralibrary.base.material.MaterialMediaCaptureContext;
 import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
-import com.lularoe.erinfetz.cameralibrary.util.CameraUtil;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.lularoe.erinfetz.core.base.material.BaseCaptureActivity;
+import com.lularoe.erinfetz.cameralibrary.types.Cameras;
+import com.lularoe.erinfetz.cameralibrary.util.DisplayOrientation;
+import com.lularoe.erinfetz.cameralibrary.util.ManufacturerUtil;
+import com.lularoe.erinfetz.core.DateTimeUtils;
+import com.lularoe.erinfetz.core.graphics.Colors;
+import com.lularoe.erinfetz.core.media.Degrees;
 
 import java.io.File;
+import java.sql.Date;
 
 import static android.app.Activity.RESULT_CANCELED;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.CAMERA_POSITION_BACK;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_ALWAYS_ON;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_AUTO;
-import static com.lularoe.erinfetz.core.base.material.BaseCaptureActivity.FLASH_MODE_OFF;
 
-/**
- *
- */
+import static com.lularoe.erinfetz.cameralibrary.types.Cameras.*;
+import static com.lularoe.erinfetz.cameralibrary.types.Media.*;
+
 abstract class BaseCameraOutputFragment extends Fragment implements CameraOutputUriProvider, View.OnClickListener {
 
     protected ImageButton mButtonVideo;
@@ -54,9 +57,12 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     protected TextView mRecordDuration;
     protected TextView mDelayStartCountdown;
 
+    private boolean mDidAutoRecord = false;
+    private Handler mDelayHandler;
+    private int mDelayCurrentSecond = -1;
     private boolean mIsRecording;
-    protected String mOutputUri;
-    protected BaseCaptureInterface mInterface;
+    protected Uri mOutputUri;
+    protected MaterialMediaCaptureContext mInterface;
     protected Handler mPositionHandler;
     protected MediaRecorder mMediaRecorder;
     private int mIconTextColor;
@@ -79,10 +85,10 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
                     stopRecordingVideo(true);
                 } else {
                     final long diff = mRecordEnd - now;
-                    mRecordDuration.setText(String.format("-%s", CameraUtil.getDurationString(diff)));
+                    mRecordDuration.setText(String.format("-%s", DateTimeUtils.getDurationString(diff)));
                 }
             } else {
-                mRecordDuration.setText(CameraUtil.getDurationString(now - mRecordStart));
+                mRecordDuration.setText(DateTimeUtils.getDurationString(now - mRecordStart));
             }
             if (mPositionHandler != null)
                 mPositionHandler.postDelayed(this, 1000);
@@ -97,7 +103,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     protected void setImageRes(ImageView iv, @DrawableRes int res) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && iv.getBackground() instanceof RippleDrawable) {
             RippleDrawable rd = (RippleDrawable) iv.getBackground();
-            rd.setColor(ColorStateList.valueOf(CameraUtil.adjustAlpha(mIconTextColor, 0.3f)));
+            rd.setColor(ColorStateList.valueOf(Colors.adjustAlpha(mIconTextColor, 0.3f)));
         }
         Drawable d = AppCompatResources.getDrawable(iv.getContext(), res);
         d = DrawableCompat.wrap(d.mutate());
@@ -115,11 +121,11 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mButtonStillshot = (ImageButton) view.findViewById(R.id.stillshot);
         mRecordDuration = (TextView) view.findViewById(R.id.recordDuration);
         mButtonFacing = (ImageButton) view.findViewById(R.id.facing);
-        if (mInterface.shouldHideCameraFacing() || CameraUtil.isChromium()) {
+        if (!mInterface.getCameraStyleConfiguration().isAllowChangeCamera() || ManufacturerUtil.isChromium()) {
             mButtonFacing.setVisibility(View.GONE);
         } else {
             setImageRes(mButtonFacing, mInterface.getCurrentCameraPosition() == CAMERA_POSITION_BACK ?
-                    mInterface.iconFrontCamera() : mInterface.iconRearCamera());
+                    mInterface.getCameraStyleConfiguration().getIconFrontCamera() : mInterface.getCameraStyleConfiguration().getIconRearCamera());
         }
 
         mButtonFlash = (ImageButton) view.findViewById(R.id.flash);
@@ -131,9 +137,9 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mButtonFlash.setOnClickListener(this);
 
         int primaryColor = getArguments().getInt(CameraIntentKey.PRIMARY_COLOR);
-        if (CameraUtil.isColorDark(primaryColor)) {
+        if (Colors.isColorDark(primaryColor)) {
             mIconTextColor = ContextCompat.getColor(getActivity(), R.color.mcam_color_light);
-            primaryColor = CameraUtil.darkenColor(primaryColor);
+            primaryColor = Colors.darkenColor(primaryColor);
         } else {
             mIconTextColor = ContextCompat.getColor(getActivity(), R.color.mcam_color_dark);
         }
@@ -141,42 +147,43 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mRecordDuration.setTextColor(mIconTextColor);
 
         if (mMediaRecorder != null && mIsRecording) {
-            setImageRes(mButtonVideo, mInterface.iconStop());
+            setImageRes(mButtonVideo, mInterface.getCameraStyleConfiguration().getIconStop());
         } else {
-            setImageRes(mButtonVideo, mInterface.iconRecord());
+            setImageRes(mButtonVideo, mInterface.getCameraStyleConfiguration().getIconRecord());
             mInterface.setDidRecord(false);
         }
 
         if (savedInstanceState != null)
-            mOutputUri = savedInstanceState.getString("output_uri");
+            mOutputUri = savedInstanceState.getParcelable(CameraIntentKey.OUTPUT_URI);
 
         if (mInterface.useStillshot()) {
             mButtonVideo.setVisibility(View.GONE);
             mRecordDuration.setVisibility(View.GONE);
             mButtonStillshot.setVisibility(View.VISIBLE);
-            setImageRes(mButtonStillshot, mInterface.iconStillshot());
+            setImageRes(mButtonStillshot, mInterface.getCameraStyleConfiguration().getIconStillShot());
             mButtonFlash.setVisibility(View.VISIBLE);
         }
 
-        if (mInterface.autoRecordDelay() < 1000) {
+        if (autoRecordDelay() < 1000) {
             mDelayStartCountdown.setVisibility(View.GONE);
         } else {
-            mDelayStartCountdown.setText(Long.toString(mInterface.autoRecordDelay() / 1000));
+            mDelayStartCountdown.setText(Long.toString(autoRecordDelay() / 1000));
         }
     }
 
     protected void onFlashModesLoaded() {
-        if (getCurrentCameraPosition() != BaseCaptureActivity.CAMERA_POSITION_FRONT) {
+        if (getCurrentCameraPosition() != CAMERA_POSITION_FRONT) {
             invalidateFlash(false);
         }
     }
 
-    private boolean mDidAutoRecord = false;
-    private Handler mDelayHandler;
-    private int mDelayCurrentSecond = -1;
+    protected long autoRecordDelay(){
+        return mInterface.getCameraConfiguration().getAutoRecord();
+    }
+
 
     protected void onCameraOpened() {
-        if (mDidAutoRecord || mInterface == null || mInterface.useStillshot() || mInterface.autoRecordDelay() < 0 || getActivity() == null) {
+        if (mDidAutoRecord || mInterface == null || mInterface.useStillshot() || autoRecordDelay() < 0 || getActivity() == null) {
             mDelayStartCountdown.setVisibility(View.GONE);
             mDelayHandler = null;
             return;
@@ -184,7 +191,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mDidAutoRecord = true;
         mButtonFacing.setVisibility(View.GONE);
 
-        if (mInterface.autoRecordDelay() == 0) {
+        if (autoRecordDelay() == 0) {
             mDelayStartCountdown.setVisibility(View.GONE);
             mIsRecording = startRecordingVideo();
             mDelayHandler = null;
@@ -194,7 +201,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mDelayHandler = new Handler();
         mButtonVideo.setEnabled(false);
 
-        if (mInterface.autoRecordDelay() < 1000) {
+        if (autoRecordDelay() < 1000) {
             // Less than a second delay
             mDelayStartCountdown.setVisibility(View.GONE);
             mDelayHandler.postDelayed(new Runnable() {
@@ -205,12 +212,12 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
                     mIsRecording = startRecordingVideo();
                     mDelayHandler = null;
                 }
-            }, mInterface.autoRecordDelay());
+            }, autoRecordDelay());
             return;
         }
 
         mDelayStartCountdown.setVisibility(View.VISIBLE);
-        mDelayCurrentSecond = (int) mInterface.autoRecordDelay() / 1000;
+        mDelayCurrentSecond = (int) autoRecordDelay() / 1000;
         mDelayHandler.postDelayed(new Runnable() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -245,13 +252,13 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     @Override
     public void onResume() {
         super.onResume();
-        if (mInterface != null && mInterface.hasLengthLimit()) {
-            if (mInterface.countdownImmediately() || mInterface.getRecordingStart() > -1) {
+        if (mInterface != null && mInterface.getCameraConfiguration().hasVideoDuration()) {
+            if (mInterface.getCameraStyleConfiguration().isCountdownImmediately()|| mInterface.getRecordingStart() > -1) {
                 if (mInterface.getRecordingStart() == -1)
                     mInterface.setRecordingStart(System.currentTimeMillis());
                 startCounter();
             } else {
-                mRecordDuration.setText(String.format("-%s", CameraUtil.getDurationString(mInterface.getLengthLimit())));
+                mRecordDuration.setText(String.format("-%s", DateTimeUtils.getDurationString(mInterface.getCameraConfiguration().getVideoDuration())));
             }
         }
     }
@@ -260,18 +267,19 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     @Override
     public final void onAttach(Activity activity) {
         super.onAttach(activity);
-        mInterface = (BaseCaptureInterface) activity;
+        mInterface = (MaterialMediaCaptureContext) activity;
     }
 
     @NonNull
     protected final File getOutputMediaFile() {
-        return CameraUtil.makeTempFile(getActivity(), getArguments().getString(CameraIntentKey.SAVE_DIR), "VID_", ".mp4");
+       // return CameraUtil.makeTempFile(getActivity(), getArguments().getString(CameraIntentKey.SAVE_DIR), "VID_", ".mp4");
+        return getArguments().getParcelable(CameraIntentKey.OUTPUT_URI);
     }
 
-    @NonNull
-    protected final File getOutputPictureFile() {
-        return CameraUtil.makeTempFile(getActivity(), getArguments().getString(CameraIntentKey.SAVE_DIR), "IMG_", ".jpg");
-    }
+//    @NonNull
+//    protected final File getOutputPictureFile() {
+//        return CameraUtil.makeTempFile(getActivity(), getArguments().getString(CameraIntentKey.SAVE_DIR), "IMG_", ".jpg");
+//    }
 
     public abstract void openCamera();
 
@@ -306,14 +314,14 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         mPositionHandler.post(mPositionUpdater);
     }
 
-    @BaseCaptureActivity.CameraPosition
+    @Cameras.CameraPosition
     public final int getCurrentCameraPosition() {
-        if (mInterface == null) return BaseCaptureActivity.CAMERA_POSITION_UNKNOWN;
+        if (mInterface == null) return CAMERA_POSITION_UNKNOWN;
         return mInterface.getCurrentCameraPosition();
     }
 
     public final int getCurrentCameraId() {
-        if (mInterface.getCurrentCameraPosition() == BaseCaptureActivity.CAMERA_POSITION_BACK)
+        if (mInterface.getCurrentCameraPosition() == CAMERA_POSITION_BACK)
             return (Integer) mInterface.getBackCamera();
         else return (Integer) mInterface.getFrontCamera();
     }
@@ -332,7 +340,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
                     mMediaRecorder.stop();
                 } catch (Throwable t) {
                     //noinspection ResultOfMethodCallIgnored
-                    new File(mOutputUri).delete();
+                    new File(mOutputUri.getPath()).delete();
                     t.printStackTrace();
                 }
                 mIsRecording = false;
@@ -344,14 +352,14 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     }
 
     public boolean startRecordingVideo() {
-        if (mInterface != null && mInterface.hasLengthLimit() && !mInterface.countdownImmediately()) {
+        if (mInterface != null && mInterface.getCameraConfiguration().hasVideoDuration() && !mInterface.getCameraStyleConfiguration().isCountdownImmediately()) {
             // Countdown wasn't started in onResume, start it now
             if (mInterface.getRecordingStart() == -1)
                 mInterface.setRecordingStart(System.currentTimeMillis());
             startCounter();
         }
 
-        final int orientation = Degrees.getActivityOrientation(getActivity());
+        final int orientation = DisplayOrientation.getActivityOrientation(getActivity());
         //noinspection ResourceType
         getActivity().setRequestedOrientation(orientation);
         mInterface.setDidRecord(true);
@@ -365,18 +373,18 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
     @Override
     public final void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("output_uri", mOutputUri);
+        outState.putParcelable(CameraIntentKey.OUTPUT_URI, mOutputUri);
     }
 
     @Override
-    public final String getOutputUri() {
+    public final Uri getOutputUri() {
         return mOutputUri;
     }
 
     protected final void throwError(Exception e) {
         Activity act = getActivity();
         if (act != null) {
-            act.setResult(RESULT_CANCELED, new Intent().putExtra(MaterialCameraActivityManager.ERROR_EXTRA, e));
+            act.setResult(RESULT_CANCELED, new Intent().putExtra(MEDIA_ERROR_EXTRA, e));
             act.finish();
         }
     }
@@ -386,8 +394,8 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         final int id = view.getId();
         if (id == R.id.facing) {
             mInterface.toggleCameraPosition();
-            setImageRes(mButtonFacing, mInterface.getCurrentCameraPosition() == BaseCaptureActivity.CAMERA_POSITION_BACK ?
-                    mInterface.iconFrontCamera() : mInterface.iconRearCamera());
+            setImageRes(mButtonFacing, mInterface.getCurrentCameraPosition() == CAMERA_POSITION_BACK ?
+                    mInterface.getCameraStyleConfiguration().getIconFrontCamera() : mInterface.getCameraStyleConfiguration().getIconRearCamera());
             closeCamera();
             openCamera();
             setupFlashMode();
@@ -397,7 +405,7 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
                 mIsRecording = false;
             } else {
                 if (getArguments().getBoolean(CameraIntentKey.SHOW_PORTRAIT_WARNING, true) &&
-                        Degrees.isPortrait(getActivity())) {
+                        DisplayOrientation.isPortrait(getActivity())) {
                     new MaterialDialog.Builder(getActivity())
                             .title(R.string.mcam_portrait)
                             .content(R.string.mcam_portrait_warning)
@@ -438,14 +446,14 @@ abstract class BaseCameraOutputFragment extends Fragment implements CameraOutput
         final int res;
         switch (mInterface.getFlashMode()) {
             case FLASH_MODE_AUTO:
-                res = mInterface.iconFlashAuto();
+                res = mInterface.getCameraStyleConfiguration().getIconFlashAuto();
                 break;
             case FLASH_MODE_ALWAYS_ON:
-                res = mInterface.iconFlashOn();
+                res = mInterface.getCameraStyleConfiguration().getIconFlashOn();
                 break;
             case FLASH_MODE_OFF:
             default:
-                res = mInterface.iconFlashOff();
+                res = mInterface.getCameraStyleConfiguration().getIconFlashOff();
         }
 
         setImageRes(mButtonFlash, res);

@@ -21,14 +21,14 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.lularoe.erinfetz.cameralibrary.R;
-import com.lularoe.erinfetz.cameralibrary.TimeLimitReachedException;
+import com.lularoe.erinfetz.cameralibrary.base.TimeLimitReachedException;
 import com.lularoe.erinfetz.cameralibrary.base.CameraConfiguration;
 import com.lularoe.erinfetz.cameralibrary.base.CameraOrientation;
-import com.lularoe.erinfetz.cameralibrary.internal.BaseGalleryFragment;
+import com.lularoe.erinfetz.cameralibrary.ui.material.BaseGalleryFragment;
 import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
 import com.lularoe.erinfetz.cameralibrary.base.CameraOutputUriProvider;
-import com.lularoe.erinfetz.cameralibrary.internal.PlaybackVideoFragment;
-import com.lularoe.erinfetz.cameralibrary.internal.StillshotPreviewFragment;
+import com.lularoe.erinfetz.cameralibrary.ui.material.PlaybackVideoFragment;
+import com.lularoe.erinfetz.cameralibrary.ui.material.StillshotPreviewFragment;
 import com.lularoe.erinfetz.cameralibrary.types.Cameras;
 import com.lularoe.erinfetz.cameralibrary.types.Media;
 import com.afollestad.materialdialogs.MaterialDialog;

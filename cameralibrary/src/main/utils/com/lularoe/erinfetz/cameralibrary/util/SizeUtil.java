@@ -1,14 +1,14 @@
 package com.lularoe.erinfetz.cameralibrary.util;
 
 import android.annotation.TargetApi;
-import android.hardware.Camera;
+import android.content.pm.ActivityInfo;
 import android.media.CamcorderProfile;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import com.lularoe.erinfetz.cameralibrary.types.Media;
 import com.lularoe.erinfetz.core.graphics.Size;
-import com.lularoe.erinfetz.core.graphics.SizeComparators;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,10 +28,10 @@ public class SizeUtil {
         if (choices == null || choices.isEmpty()) return null;
         if (choices.size() == 1) return choices.get(0);
 
-        Size maxPictureSize = Collections.max(choices, SizeComparators.byArea());
-        Size minPictureSize = Collections.min(choices, SizeComparators.byArea());
+        Size maxPictureSize = Collections.max(choices, Size.byArea());
+        Size minPictureSize = Collections.min(choices, Size.byArea());
 
-        Collections.sort(choices, SizeComparators.byArea());
+        Collections.sort(choices, Size.byArea());
 
 
         return getPictureSize(choices, mediaQuality, maxPictureSize, minPictureSize);
@@ -76,10 +76,10 @@ public class SizeUtil {
 
         if (choices.size() == 1) return choices.get(0);
 
-        Size maxPictureSize = Collections.max(choices, SizeComparators.byArea());
-        Size minPictureSize = Collections.min(choices, SizeComparators.byArea());
+        Size maxPictureSize = Collections.max(choices, Size.byArea());
+        Size minPictureSize = Collections.min(choices, Size.byArea());
 
-        Collections.sort(choices, SizeComparators.byArea());
+        Collections.sort(choices, Size.byArea());
 
         return getPictureSize(choices, mediaQuality, maxPictureSize, minPictureSize);
     }
@@ -239,10 +239,129 @@ public class SizeUtil {
 
         // Pick the smallest of those, assuming we found any
         if (bigEnough.size() > 0) {
-            return Collections.min(bigEnough, SizeComparators.byArea());
+            return Collections.min(bigEnough, Size.byArea());
         } else {
             Log.e(TAG, "Couldn't find any suitable preview size");
             return null;
+        }
+    }
+
+    public static Size chooseOptimalSize(List<Size> choices, int width, int height, Size aspectRatio) {
+        // Collect the supported resolutions that are at least as big as the preview Surface
+        List<Size> bigEnough = new ArrayList<>();
+        int w = aspectRatio.getWidth();
+        int h = aspectRatio.getHeight();
+        for (Size option : choices) {
+            if (option.getHeight() == option.getWidth() * h / w &&
+                    option.getWidth() >= width && option.getHeight() >= height) {
+                bigEnough.add(option);
+            }
+        }
+
+        // Pick the smallest of those, assuming we found any
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, Size.byArea());
+        } else {
+            Log.e(TAG, "Couldn't find any suitable preview size");
+            return null;
+        }
+    }
+
+    public static Size chooseVideoSize(int videoPreferredHeight, float videoPreferredAspect, List<Size> choices) {
+        Size backupSize = null;
+        for (Size size : choices) {
+            if (size.getHeight() <= videoPreferredHeight) {
+                if (size.getWidth() == size.getHeight() * videoPreferredAspect)
+                    return size;
+                if (videoPreferredHeight >= size.getHeight())
+                    backupSize = size;
+            }
+        }
+        if (backupSize != null) return backupSize;
+        Log.e(TAG, "Couldn't find any suitable video size");
+        return choices.get(choices.size() - 1);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static Size chooseVideoSize(int videoPreferredHeight, float videoPreferredAspect, Size[] choices) {
+        Size backupSize = null;
+        for (Size size : choices) {
+            if (size.getHeight() <= videoPreferredHeight) {
+                if (size.getWidth() == size.getHeight() * videoPreferredAspect)
+                    return size;
+                if (videoPreferredHeight >= size.getHeight())
+                    backupSize = size;
+            }
+        }
+        if (backupSize != null) return backupSize;
+        Log.e(TAG, "Couldn't find any suitable video size");
+        return choices[choices.length - 1];
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static Size chooseOptimalSize(Size[] choices, int textureViewWidth,
+                                          int textureViewHeight, int maxWidth, int maxHeight, Size aspectRatio) {
+
+        // Collect the supported resolutions that are at least as big as the preview Surface
+        List<Size> bigEnough = new ArrayList<>();
+        // Collect the supported resolutions that are smaller than the preview Surface
+        List<Size> notBigEnough = new ArrayList<>();
+        int w = aspectRatio.getWidth();
+        int h = aspectRatio.getHeight();
+        for (Size option : choices) {
+            if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight &&
+                    option.getHeight() == option.getWidth() * h / w) {
+                if (option.getWidth() >= textureViewWidth &&
+                        option.getHeight() >= textureViewHeight) {
+                    bigEnough.add(option);
+                } else {
+                    notBigEnough.add(option);
+                }
+            }
+        }
+
+        // Pick the smallest of those big enough. If there is no one big enough, pick the
+        // largest of those not big enough.
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, Size.byArea());
+        } else if (notBigEnough.size() > 0) {
+            return Collections.max(notBigEnough, Size.byArea());
+        } else {
+            Log.e(TAG, "Couldn't find any suitable preview size");
+            return choices[0];
+        }
+    }
+
+    public static Size chooseOptimalSize(List<Size> choices, int textureViewWidth,
+                                          int textureViewHeight, int maxWidth, int maxHeight, Size aspectRatio) {
+
+        // Collect the supported resolutions that are at least as big as the preview Surface
+        List<Size> bigEnough = new ArrayList<>();
+        // Collect the supported resolutions that are smaller than the preview Surface
+        List<Size> notBigEnough = new ArrayList<>();
+        int w = aspectRatio.getWidth();
+        int h = aspectRatio.getHeight();
+        for (Size option : choices) {
+            if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight &&
+                    option.getHeight() == option.getWidth() * h / w) {
+                if (option.getWidth() >= textureViewWidth &&
+                        option.getHeight() >= textureViewHeight) {
+                    bigEnough.add(option);
+                } else {
+                    notBigEnough.add(option);
+                }
+            }
+        }
+
+        // Pick the smallest of those big enough. If there is no one big enough, pick the
+        // largest of those not big enough.
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, Size.byArea());
+        } else if (notBigEnough.size() > 0) {
+            return Collections.max(notBigEnough, Size.byArea());
+        } else {
+            Log.e(TAG,"Couldn't find any suitable preview size");
+            return choices.get(0);
         }
     }
 
@@ -256,5 +375,28 @@ public class SizeUtil {
 
     public static long calculateMinimumRequiredBitRate(CamcorderProfile camcorderProfile, long maxFileSize, int seconds) {
         return 8 * maxFileSize / seconds - camcorderProfile.audioBitRate;
+    }
+
+    public static Size getDimensions(int orientation, float videoWidth, float videoHeight, View v) {
+        final float aspectRatio = videoWidth / videoHeight;
+        int width;
+        int height;
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
+                orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+            width = v.getMeasuredWidth();
+            height = (int) ((float) width / aspectRatio);
+            if (height > v.getMeasuredHeight()) {
+                height = v.getMeasuredHeight();
+                width = (int) ((float) height * aspectRatio);
+            }
+        } else {
+            height = v.getMeasuredHeight();
+            width = (int) ((float) height * aspectRatio);
+            if (width > v.getMeasuredWidth()) {
+                width = v.getMeasuredWidth();
+                height = (int) ((float) width / aspectRatio);
+            }
+        }
+        return new Size(width, height);
     }
 }

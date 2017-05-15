@@ -1,4 +1,4 @@
-package com.lularoe.erinfetz.cameralibrary.internal;
+package com.lularoe.erinfetz.cameralibrary.ui.material;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,6 +12,9 @@ import android.widget.ImageView;
 
 import com.lularoe.erinfetz.cameralibrary.R;
 import com.lularoe.erinfetz.cameralibrary.types.CameraIntentKey;
+import com.lularoe.erinfetz.core.media.BitmapTransformations;
+import com.lularoe.erinfetz.core.media.BitmapUtils;
+import com.lularoe.erinfetz.core.storage.files.MediaType;
 
 public class StillshotPreviewFragment extends BaseGalleryFragment {
 
@@ -44,8 +47,8 @@ public class StillshotPreviewFragment extends BaseGalleryFragment {
         super.onViewCreated(view, savedInstanceState);
         mImageView = (ImageView) view.findViewById(R.id.stillshot_imageview);
 
-        mConfirm.setText(mInterface.labelConfirm());
-        mRetry.setText(mInterface.labelRetry());
+        mConfirm.setText(mInterface.getCameraStyleConfiguration().getLabelConfirmPhoto());
+        mRetry.setText(mInterface.getCameraStyleConfiguration().getLabelRetry());
 
         mRetry.setOnClickListener(this);
         mConfirm.setOnClickListener(this);
@@ -84,7 +87,7 @@ public class StillshotPreviewFragment extends BaseGalleryFragment {
 
         // TODO IMPROVE MEMORY USAGE HERE, ESPECIALLY ON LOW-END DEVICES.
         if (mBitmap == null)
-            mBitmap = ImageUtil.getRotatedBitmap(Uri.parse(mOutputUri).getPath(), width, height);
+            mBitmap = BitmapTransformations.getRotatedBitmap(mOutputUri.getPath(), width, height);
 
         if (mBitmap == null)
             showDialog(getString(R.string.mcam_image_preview_error_title), getString(R.string.mcam_image_preview_error_message));
@@ -97,6 +100,6 @@ public class StillshotPreviewFragment extends BaseGalleryFragment {
         if (v.getId() == R.id.retry)
             mInterface.onRetry(mOutputUri);
         else if (v.getId() == R.id.confirm)
-            mInterface.useMedia(mOutputUri);
+            mInterface.useMedia(mOutputUri, MediaType.IMAGE_JPEG);
     }
 }
