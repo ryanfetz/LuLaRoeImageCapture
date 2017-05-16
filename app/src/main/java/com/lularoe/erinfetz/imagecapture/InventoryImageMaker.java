@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.util.Log;
 
 import com.google.common.base.Strings;
+import com.lularoe.erinfetz.core.media.BitmapTransformations;
 import com.lularoe.erinfetz.core.storage.files.StoredFile;
 
 import java.io.File;
@@ -77,12 +78,12 @@ public class InventoryImageMaker {
 
     public Bitmap standard(String photoPath, Bitmap bitmap, String style, String size)throws IOException {
 
-        Bitmap im = BitmapUtils.rotateIfRequired(photoPath, bitmap);
+        bitmap = BitmapTransformations.rotateIfRequired(photoPath, bitmap);
 
-        Canvas canvas = new Canvas(im);
+        Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
 
-        Bitmap overlay = BitmapUtils.resizeWidth(ProductPriceImages.getInstance(context).get(style), PRICE_IMAGE_WIDTH);
+        Bitmap overlay = BitmapTransformations.resizeWidth(ProductPriceImages.getInstance(context).get(style), PRICE_IMAGE_WIDTH);
 
         canvas.drawBitmap(overlay, PROD_X, PROD_Y, paint);
 
@@ -90,12 +91,12 @@ public class InventoryImageMaker {
         if(!Strings.isNullOrEmpty(size)){
             overlay = ProductSizeBubbles.getInstance(context).create(size);
             if(overlay!=null) {
-                canvas.drawBitmap(BitmapUtils.resizeWidth(overlay,SIZE_IMAGE_WIDTH), SZ_X, SZ_Y, paint);
+                canvas.drawBitmap(BitmapTransformations.resizeWidth(overlay,SIZE_IMAGE_WIDTH), SZ_X, SZ_Y, paint);
             }
         }
         overlay = getImage(R.drawable.watermark);
 
-        canvas.drawBitmap(BitmapUtils.resizeWidth(overlay,WATERMARK_IMAGE_WIDTH), WM_X, WM_Y, paint);
-        return im;
+        canvas.drawBitmap(BitmapTransformations.resizeWidth(overlay,WATERMARK_IMAGE_WIDTH), WM_X, WM_Y, paint);
+        return bitmap;
     }
 }

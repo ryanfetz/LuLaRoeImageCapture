@@ -66,6 +66,15 @@ public class BitmapTransformations {
         return decodedBitmap;
     }
 
+    public static Bitmap rotateIfRequired(String photoPath, Bitmap bitmap){
+
+        ExifOrientation eo = ExifOrientation.get(photoPath);
+
+        bitmap = applyMatrix(bitmap, eo.getMatrix());
+
+        return bitmap;
+    }
+
     @Nullable
     public static Bitmap getRotatedBitmap(String inputFile, int requestedWidth, int requestedHeight) {
         final int rotationInDegrees = ExifOrientation.getExifOrientationDegrees(inputFile);

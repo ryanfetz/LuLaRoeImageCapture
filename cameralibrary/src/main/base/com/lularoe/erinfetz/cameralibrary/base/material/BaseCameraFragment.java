@@ -66,11 +66,6 @@ public abstract class BaseCameraFragment extends Fragment implements CameraOutpu
     private Handler mDelayHandler;
     private int mDelayCurrentSecond = -1;
 
-    protected static void LOG(Object context, String message) {
-        Log.d(context instanceof Class<?> ? ((Class<?>) context).getSimpleName() :
-                context.getClass().getSimpleName(), message);
-    }
-
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
         public void run() {

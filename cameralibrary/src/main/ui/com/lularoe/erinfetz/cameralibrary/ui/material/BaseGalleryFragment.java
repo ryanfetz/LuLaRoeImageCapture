@@ -18,12 +18,12 @@ import com.lularoe.erinfetz.core.graphics.Colors;
 
 public abstract class BaseGalleryFragment extends Fragment implements CameraOutputUriProvider, View.OnClickListener {
 
-    MaterialMediaCaptureContext mInterface;
-    int mPrimaryColor;
-    Uri mOutputUri;
-    View mControlsFrame;
-    Button mRetry;
-    Button mConfirm;
+    protected MaterialMediaCaptureContext mInterface;
+    protected int mPrimaryColor;
+    protected Uri mOutputUri;
+    protected View mControlsFrame;
+    protected Button mRetry;
+    protected Button mConfirm;
 
     @SuppressWarnings("deprecation")
     @Override
